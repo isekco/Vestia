@@ -1,0 +1,57 @@
+VESTIA – CHECKPOINT 1 (Project Bootstrap)
+Date: 2026-01-27
+Status: Build OK
+
+Goal
+- Vestia Android projesi sıfırdan, minimum soyutlama (no-magic) yaklaşımıyla başlatıldı.
+- Amaç: Android runtime akışını (Application → Activity → View) adım adım ve bilinçli şekilde anlamak.
+
+Project Setup
+- Template: Empty Views Activity (XML / View system)
+- Language: Kotlin
+- Build System: Gradle Kotlin DSL (build.gradle.kts)
+- Minimum SDK: API 24 (Android 7.0)
+- Namespace / ApplicationId: com.isekco.vestia
+
+Result
+- Proje, mevcut Git repository root klasörü içine oluşturuldu.
+- Android Studio “folder not empty” uyarısı bilerek ignore edildi.
+- Gradle sync ve build başarıyla tamamlandı.
+
+Repository Structure (Root)
+- app/                 : Android application module
+- gradle/              : Gradle wrapper support files
+- gradlew / gradlew.bat: Reproducible Gradle builds
+- build.gradle.kts     : Root build configuration
+- settings.gradle.kts  : Project/module definitions
+- gradle.properties    : Global Gradle settings
+- .gitignore           : Excludes IDE, cache and local files
+
+Git Decisions
+Included in repository:
+- app/
+- gradle/
+- gradlew, gradlew.bat
+- build.gradle.kts
+- settings.gradle.kts
+- gradle.properties
+- .gitignore
+
+Excluded from repository:
+- .idea/
+- .gradle/
+- local.properties
+- */build/*
+- *.iml
+
+Design Decisions
+- Jetpack Compose intentionally not used.
+- Classic View/XML system preferred to keep lifecycle, inflation and view hierarchy explicit.
+- No DI framework, Room, or advanced abstractions introduced at this stage.
+
+Next Step
+- Analyze and explain Android entry points:
+  * AndroidManifest.xml
+  * MainActivity.kt
+  * activity_main.xml
+- Decide on introducing a custom Application class (VestiaApp) in a later checkpoint.
