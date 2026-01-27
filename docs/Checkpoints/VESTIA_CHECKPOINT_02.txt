@@ -1,0 +1,61 @@
+VESTIA – CHECKPOINT 2
+====================
+
+Amaç
+-----
+Android uygulamasının en temel ayağa kalkma mekanizmasını,
+framework’e körü körüne girmeden, bilinçli şekilde anlamak.
+
+Bu checkpoint’te iş yapan hiçbir kod yazılmamıştır.
+Amaç sadece “iskelet”i doğru kurmaktır.
+
+
+Yapılanlar
+----------
+1. Custom Application class oluşturuldu.
+   - VestiaApp.kt dosyası com.isekco.vestia paketi altında tanımlandı.
+   - AndroidManifest.xml içinde android:name=".VestiaApp" ile bağlandı.
+   - Application lifecycle’ın Activity’den önce çalıştığı doğrulandı.
+   - Logcat üzerinden VestiaApp.onCreate() çağrısı gözlemlendi.
+
+2. MainActivity bilinçli şekilde en çıplak haliyle tanımlandı.
+   - AppCompatActivity kullanılmadı.
+   - ComponentActivity tercih edildi.
+   - Sadece zorunlu import’lar eklendi:
+       - android.os.Bundle
+       - androidx.activity.ComponentActivity
+   - onCreate() override edilip super.onCreate() çağrıldı.
+
+3. Framework kullanımında sınırlar özellikle çizildi.
+   - ViewModel, Repository, DI, UI, XML, Adapter gibi katmanlara
+     BİLEREK girilmedi.
+   - Amaç Android OS → Application → Activity zincirini netleştirmekti.
+
+4. Android çalışma modeli zihinsel olarak netleştirildi.
+   - Application: process başına tek, global context.
+   - Activity: ekran ve UI lifecycle yöneticisi.
+   - Activity’lerin Application içinde yaşadığı doğrulandı.
+
+
+Bu Checkpoint’te Bilerek Yapılmayanlar
+-------------------------------------
+- setContentView
+- XML layout
+- ViewModel / MVVM
+- Repository / Storage
+- JSON / persistence
+- Dependency Injection
+- UI state / Adapter
+
+Bunlar ilerleyen checkpoint’lerde ele alınacaktır.
+
+
+Sonuç
+-----
+Checkpoint-2 sonunda Vestia projesi:
+- Build edilebilir
+- Çalışabilir
+- Ama bilinçli şekilde “boş”
+
+Bu checkpoint, Vestia’nın sağlam bir temel üzerinde
+adım adım ve kontrolle ilerlemesi için kilit bir duraktır.
