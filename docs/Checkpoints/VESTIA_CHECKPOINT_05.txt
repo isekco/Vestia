@@ -1,0 +1,71 @@
+VESTIA – CHECKPOINT 5
+Topic: Activity Lifecycle – Observation & Kotlin Guards
+
+Goal
+----
+This checkpoint focuses on understanding the Android Activity lifecycle
+by observing real callback execution order, without introducing ViewModel,
+state persistence, or architecture layers.
+
+Scope
+-----
+- MainActivity with lifecycle callbacks overridden
+- Lifecycle events logged both to Logcat and on-screen TextView
+- XML layout prepared only to visualize lifecycle events
+- No business logic, no ViewModel, no state restoration logic
+
+What Was Implemented
+--------------------
+1. A dedicated TextView (tvLifeCycle) was added to activity_main.xml
+   to display lifecycle events.
+   - Positioned with layout_marginTop
+   - Padding added only for readability
+   - No scrolling or size limits applied intentionally
+
+2. MainActivity.kt overrides the following lifecycle callbacks:
+   - onCreate
+   - onStart
+   - onResume
+   - onPause
+   - onStop
+   - onRestart
+   - onDestroy
+
+3. A helper function `mark(event: String)` was introduced to:
+   - Log lifecycle events to Logcat (tag: VestiaLC)
+   - Append lifecycle events to the screen (newest on top)
+
+4. Kotlin-specific concepts demonstrated:
+   - lateinit var usage for view references
+   - ::property reference operator
+   - isInitialized property for lateinit guards
+   - Guard clause pattern using early return
+   - String interpolation with $var and ${expression}
+   - Type inference via val assignment
+
+Important Observations
+---------------------
+- Lifecycle callbacks can be triggered multiple times and in different
+  orders depending on user actions and OS decisions.
+- Screen rotation recreates the Activity by default:
+  old instance receives onPause → onStop → onDestroy
+  new instance starts with onCreate(savedInstanceState=true).
+- Guard clauses are used only to protect preconditions, not to control
+  general flow.
+- The on-screen log is intentionally non-idempotent for learning purposes.
+
+Explicitly Not Included
+-----------------------
+- ViewModel
+- LiveData / StateFlow
+- onSaveInstanceState usage
+- UI state restoration
+- Navigation
+- Architectural refactoring
+
+Status
+------
+- Project is buildable and runnable.
+- Code is intentionally minimal and observation-focused.
+- This checkpoint serves as a conceptual foundation for later state
+  and architecture discussions.
