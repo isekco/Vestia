@@ -1,0 +1,80 @@
+VESTIA — CHECKPOINT 4
+Activity & UI’ya Bilinçli Giriş
+
+AMAÇ
+Bu checkpoint’in amacı Android’de bir ekranın nasıl var olduğunu, UI’nin Activity’ye nasıl bağlandığını ve event’lerin lifecycle’dan bağımsız nasıl çalışabildiğini bilinçli şekilde kavramaktır. Amaç özellik geliştirmek değil, doğru framework zihinsel modelini kurmaktır.
+
+1) XML’İN ROLÜ
+- XML çalışmaz, mantık içermez.
+- Sadece UI’nin deklaratif tarifidir.
+- Runtime’da setContentView() ile View nesnelerine dönüştürülür.
+
+XML = deklarasyon
+View = gerçek runtime nesnesi
+
+2) ACTIVITY’NİN ROLÜ
+- Activity UI’nin sahibi değildir.
+- UI’yi bağlayan ve yöneten kontrol noktasıdır.
+- OS tarafından yaratılır ve lifecycle callback’leri ile sürülür.
+
+Activity = kontrol katmanı
+UI = bağlanan katman
+
+3) onCreate() VE LIFECYCLE GERÇEĞİ
+- onCreate(), aynı Activity instance’ı için bir kere çağrılır.
+- UI kurulumu için doğru yerdir.
+- Activity arkaya alınıp geri gelirse onCreate tekrar çağrılmayabilir.
+- Activity instance yaşamaya devam ettiği sürece UI ve listener’lar da yaşar.
+
+Bu checkpoint’te lifecycle:
+- Tanındı
+- Anlaşıldı
+- Bilinçli olarak kullanılmadı
+
+Lifecycle bu checkpoint’te mühürlendi.
+
+4) savedInstanceState KAVRAYIŞI
+- UI state snapshot’ıdır.
+- Business data taşımaz.
+- İlk açılışta null’dır.
+- Activity yeniden yaratılırsa OS tarafından geri verilir.
+
+Bu checkpoint’te:
+- Tanındı
+- Kullanılmadı
+
+5) findViewById VE VIEW TREE
+- setContentView() sonrası View tree RAM’de oluşur.
+- findViewById XML’de değil, bellekteki View ağacında arama yapar.
+- R.id.* nesne değil, compile-time üretilmiş anahtardır.
+
+6) BUTTON CLICK LISTENER DAVRANIŞI
+- setOnClickListener, View nesnesi içinde callback referansı saklar.
+- Listener Activity yaşadığı sürece aktiftir.
+- onPause / onResume ile bozulmaz.
+- Activity yeniden yaratılırsa listener onCreate içinde tekrar kurulur.
+
+UI içi listener’lar lifecycle geçişleriyle otomatik sıfırlanmaz.
+
+7) BİLİNÇLİ OLARAK YAPILMAYANLAR
+- ViewModel
+- State management
+- Repository
+- savedInstanceState kullanımı
+- onResume / onPause override’ları
+- Best practice refleksi
+
+Amaç: önce doğru zihinsel model, sonra mimari.
+
+8) ALTIN CÜMLELER
+- Activity ≠ UI
+- XML ≠ çalışan kod
+- setContentView() = inflate + attach
+- Listener’lar UI nesnesinin parçasıdır
+- Lifecycle bilinmeden yazılan kod şanstır
+
+PROJE DURUMU
+Proje: Vestia
+Checkpoint: 4
+Durum: Tamamlandı
+Yaklaşım: Minimal, bilinçli, öğretici
