@@ -1,0 +1,126 @@
+NETFOLIO – CHECKPOINT 3
+======================
+Android Runtime ve OS-Level Mimari Temeller
+
+Bu doküman Checkpoint 3 kapsamında Android uygulamasının
+OS seviyesinde nasıl ayağa kalktığını, Application / Context / Activity
+kavramlarının gerçek rollerini ve Netfolio projesi için alınan
+bağlayıcı mimari kararları özetler.
+
+------------------------------------------------------------
+1. Android Uygulaması Nedir?
+------------------------------------------------------------
+- APK bir uygulama değildir.
+- Uygulama, Linux üzerinde çalışan izole bir process’tir.
+- Her uygulama:
+  - Kendine ait UID
+  - Kendine ait bellek alanı
+  - Kendine ait Android Runtime (ART) instance’ı
+  ile çalışır.
+
+------------------------------------------------------------
+2. Uygulama Nasıl Başlatılır?
+------------------------------------------------------------
+- Kullanıcı launcher’dan uygulamayı başlatır.
+- ActivityManagerService (AMS) devreye girer.
+- Uygulama process’i yoksa:
+  - Zygote üzerinden yeni process fork edilir.
+- Process içinde:
+  - ART başlar
+  - Framework sınıfları yüklenir
+  - Application nesnesi oluşturulur
+
+Geliştirici bu sürecin hiçbir adımını kontrol etmez.
+
+------------------------------------------------------------
+3. Zygote Kavramı
+------------------------------------------------------------
+- Android boot sırasında başlatılan özel bir process’tir.
+- ART ve framework sınıfları önceden yüklenmiştir.
+- Yeni uygulamalar copy-on-write ile hızlıca üretilir.
+- Zygote bir uygulama değildir.
+
+------------------------------------------------------------
+4. Application Sınıfı
+------------------------------------------------------------
+- Process başına tek instance vardır.
+- OS tarafından yaratılır.
+- Component’lerin (Activity, Service vb.) ortak zeminidir.
+- UI bilgisi içermez.
+- Process yaşadığı sürece hayattadır.
+
+Application.onCreate():
+- Process ayağa kalktıktan sonra
+- Activity’den önce
+- Sadece bir kez çağrılır
+
+------------------------------------------------------------
+5. Context Kavramı
+------------------------------------------------------------
+Context:
+- OS ile uygulama arasındaki kontrattır.
+- Bir yetki ve ortam tanımıdır.
+- Kaynaklara, dosya sistemine ve sistem servislerine erişim sağlar.
+
+Context türleri:
+- Application Context:
+  - Uzun ömürlü
+  - UI bilgisi içermez
+  - Repository, Store, altyapı için uygundur
+- Activity Context:
+  - UI lifecycle’a bağlıdır
+  - Theme ve window bilgisi içerir
+  - Uzun ömürlü nesnelerde tutulmamalıdır
+
+Yanlış context kullanımı memory leak’e yol açar.
+
+------------------------------------------------------------
+6. Activity Kavramı
+------------------------------------------------------------
+- Activity bir “ekran” değildir.
+- OS tarafından yönetilen bir UI state temsilcisidir.
+- Lifecycle OS’nin zorunlu state machine’idir.
+- Activity kısa ömürlüdür ve her an yok edilebilir.
+
+onCreate():
+- UI oluşturulur
+- Ama henüz kullanıcıyla etkileşim yoktur
+
+setContentView():
+- XML → View ağacı dönüşümünü yapar
+- UI’yı gösterme işi OS’ye aittir
+
+------------------------------------------------------------
+7. Kontrol Akışı Gerçeği
+------------------------------------------------------------
+- Android’de kontrol geliştiricide değildir.
+- Akış OS tarafından yönetilir.
+- Geliştirici sadece callback implement eder.
+- main() yoktur.
+- Lineer execution modeli yoktur.
+
+------------------------------------------------------------
+8. Netfolio İçin Alınan Mimari Kararlar
+------------------------------------------------------------
+- Custom Application kullanılacak (minimal).
+- Application:
+  - Dependency root
+  - Altyapı init noktası
+- Activity:
+  - Sadece UI host
+  - İş mantığı yok
+- ViewModel:
+  - Context almaz
+- Repository / Store:
+  - Application context kullanır
+
+------------------------------------------------------------
+9. Checkpoint 3 Durumu
+------------------------------------------------------------
+- Kod yazılmadı.
+- Mimari zemin netleştirildi.
+- OS – Application – Activity sınırları çizildi.
+- Checkpoint 3 burada dondurulmuştur.
+
+Bir sonraki adım: Checkpoint 4
+(UI ve Activity’ye bilinçli giriş)
