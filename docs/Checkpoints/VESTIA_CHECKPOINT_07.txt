@@ -1,0 +1,101 @@
+VESTIA — CHECKPOINT 7
+ViewModel ile UI State’i Doğru Yerde Tutmak (Rotation’da Kaybolmayan Counter)
+
+Date: 2026-01-29
+Status: Build OK
+
+Amaç
+-----
+Checkpoint 6’da çözdüğümüz “rotation’da state kaybı” problemini bu kez
+Bundle (savedInstanceState) ile değil, Android’in önerdiği “UI state sahibi” olan
+ViewModel ile çözmek.
+
+Hedeflenen farkındalık:
+- Activity instance’ı rotation/config change ile yeniden yaratılır ve field’lar sıfırlanır.
+- ViewModel, Activity instance’ına değil, Activity’nin ViewModelStore’una bağlanır.
+- Rotation’da yeni Activity instance’ı gelse bile aynı ViewModel instance’ı geri verilir.
+- Activity gerçekten kapanırsa (finish/back), ViewModel onCleared() ile temizlenir.
+- Process ölürse ViewModel de ölür (kalıcılık değildir).
+
+Kapsam (Bilinçli Minimal)
+-------------------------
+- Tek ekran
+- Tek state: counter
+- ViewModel kullanımı: CounterViewModel
+- LiveData/StateFlow yok (bilerek)
+- savedInstanceState ile counter restore yok (bilerek kaldırıldı)
+- Persistence yok
+
+Yapılanlar
+----------
+1) Counter state Activity’den çıkarıldı
+   - MainActivity içindeki `private var counter` kaldırıldı.
+   - Counter artık sadece ViewModel içinde tutuluyor.
+
+2) CounterViewModel oluşturuldu
+   - `counter` state’i ViewModel’de tutuluyor.
+   - `increment()` ile state güncelleniyor.
+   - `onCleared()` override edilerek ViewModel’in yaşam döngüsü gözlemlendi.
+
+3) MainActivity “UI host” rolüne indirildi
+   - ViewModelProvider ile ViewModel talep ediliyor:
+       viewModel = ViewModelProvider(this)[CounterViewModel::class.java]
+   - UI sadece render ediyor:
+       tvCounter.text = "Counter: ${viewModel.counter}"
+   - Buton click sadece niyet bildiriyor:
+       viewModel.increment(); render()
+
+4) Kimlik (identity) testi ile davranış kanıtlandı
+   - `System.identityHashCode(this)` ile Activity hash’i
+   - `System.identityHashCode(viewModel)` ile ViewModel hash’i
+   - Log tag: VestiaTrace
+
+Gözlemler (Logcat Kanıtı)
+-------------------------
+- İlk açılış:
+  init vmHash=... + onCreate actHash=... vmHash=... saved=false
+
+- Rotation / recreate:
+  onDestroy actHash=... isFinishing=false
+  onCreate  actHash=YENİ  vmHash=AYNI saved=true
+
+  Sonuç:
+  - actHash değişiyor (yeni Activity instance)
+  - vmHash aynı kalıyor (aynı ViewModel instance)
+
+- Gerçek kapanış (back/finish):
+  onDestroy isFinishing=true
+  onCleared vmHash=...
+
+  Sonuç:
+  - Activity gerçekten kapanınca ViewModelStore temizleniyor
+  - ViewModel onCleared() çağrılıyor
+
+Test Senaryosu (Beklenen Davranış)
+----------------------------------
+1) Uygulamayı aç
+2) +1’e bas, counter artsın
+3) Rotate et (portrait <-> landscape)
+4) Counter değeri KORUNMALI (ViewModel sayesinde)
+5) Back ile çık / finish
+6) Log’da onCleared() görülmeli
+
+Bu Checkpoint’te Bilerek Yapılmayanlar
+--------------------------------------
+- StateFlow / LiveData
+- savedInstanceState ile restore
+- Kalıcılık (DataStore/DB/File)
+- Mimari katmanlar (Repository/UseCase vb.)
+
+Sonuç
+-----
+Checkpoint 7 ile şu ayrım netleşti:
+- Activity field = instance RAM’i (rotation’da gider)
+- savedInstanceState = OS snapshot (geçici; küçük state)
+- ViewModel = ekranın UI state sahibi (rotation/config change’de korunur; process ölürse gider)
+
+Bir sonraki adım (Checkpoint 8 önerisi)
+---------------------------------------
+- UI state’i “observable” hale getirmek (StateFlow/LiveData)
+- Render çağrılarını otomatik hale getirmek
+- Process death senaryosu için kalıcılık stratejisi (DataStore/DB)

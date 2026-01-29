@@ -6,16 +6,14 @@ import androidx.activity.ComponentActivity
 import android.widget.TextView
 import android.widget.Button
 import android.util.Log
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : ComponentActivity() {
 
-    companion object {
-        const val KEY_COUNTER = "cnt"
-    }
-
     private lateinit var tvCounter: TextView
     private lateinit var btnInc: Button
-    private var counter: Int = 0
+
+    private lateinit var viewModel: CounterViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,30 +22,29 @@ class MainActivity : ComponentActivity() {
         tvCounter = findViewById(R.id.tvCounter)
         btnInc = findViewById(R.id.btnInc)
 
-        counter = savedInstanceState?.getInt(KEY_COUNTER) ?: 0
+        viewModel = ViewModelProvider(this)[CounterViewModel::class.java]
 
-        Log.d("VestiaState", "onCreate(savedInstanceState=${savedInstanceState != null}) counter=$counter")
+        Log.d(
+            "VestiaTrace",
+            "onCreate actHash=${System.identityHashCode(this)} " +
+                    "vmHash=${System.identityHashCode(viewModel)} " +
+                    "saved=${savedInstanceState != null}"
+        )
+
         render()
 
         btnInc.setOnClickListener{
-            counter++
-            Log.d("VestiaState", "click -> counter=$counter")
+            viewModel.increment()
             render()
-
         }
-
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-
-        outState.putInt(KEY_COUNTER, counter)
-
-
-
+    override fun onDestroy() {
+        Log.d("VestiaTrace", "onDestroy actHash=${System.identityHashCode(this)} isFinishing=$isFinishing")
+        super.onDestroy()
     }
 
     private fun render(){
-        tvCounter.text = "Counter : $counter"
+        tvCounter.text = "Counter: ${viewModel.counter}"
     }
 }
