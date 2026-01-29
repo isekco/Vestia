@@ -1,6 +1,7 @@
 package com.isekco.vestia
 
 import android.os.Bundle
+import android.os.PersistableBundle
 import androidx.activity.ComponentActivity
 import android.widget.TextView
 import android.widget.Button
@@ -8,55 +9,45 @@ import android.util.Log
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var tvLifeCycle: TextView
-
-    private fun mark(event: String) {
-        Log.d("VestiaLC", event)
-
-        // TextView hazır değilse (onCreate öncesi) sadece log bas
-        if (!::tvLifeCycle.isInitialized) return
-
-        val prev = tvLifeCycle.text?.toString().orEmpty()
-        val line = "• $event"
-
-        tvLifeCycle.text = if (prev.isBlank()) line else "$line\n$prev"
+    companion object {
+        const val KEY_COUNTER = "cnt"
     }
+
+    private lateinit var tvCounter: TextView
+    private lateinit var btnInc: Button
+    private var counter: Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
-        tvLifeCycle = findViewById(R.id.tvLifecycle)
 
-        mark("onCreate (savedInstanseState=${savedInstanceState != null})")
-    }
-    override fun onStart() {
-        super.onStart()
-        mark("onStart")
-    }
+        tvCounter = findViewById(R.id.tvCounter)
+        btnInc = findViewById(R.id.btnInc)
 
-    override fun onResume() {
-        super.onResume()
-        mark("onResume")
-    }
+        counter = savedInstanceState?.getInt(KEY_COUNTER) ?: 0
 
-    override fun onPause() {
-        mark("onPause")
-        super.onPause()
-    }
+        Log.d("VestiaState", "onCreate(savedInstanceState=${savedInstanceState != null}) counter=$counter")
+        render()
 
-    override fun onStop() {
-        mark("onStop")
-        super.onStop()
+        btnInc.setOnClickListener{
+            counter++
+            Log.d("VestiaState", "click -> counter=$counter")
+            render()
+
+        }
+
     }
 
-    override fun onDestroy() {
-        mark("onDestroy")
-        super.onDestroy()
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt(KEY_COUNTER, counter)
+
+
+
     }
 
-    override fun onRestart() {
-        super.onRestart()
-        mark("onRestart")
+    private fun render(){
+        tvCounter.text = "Counter : $counter"
     }
 }

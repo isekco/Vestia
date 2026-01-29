@@ -1,0 +1,78 @@
+VESTIA — CHECKPOINT 6
+State Problemi ile Bilinçli Yüzleşme (Rotation / Activity Recreate)
+
+Date: 2026-01-29
+Status: Build OK
+
+Amaç
+-----
+Bu checkpoint’in amacı “ekrana ait görünen bir bilginin (UI state) aslında nerede yaşadığı” sorusunu
+bilerek problem yaratarak anlamaktı.
+
+Özellikle hedeflenen farkındalık:
+- Activity yeniden yaratıldığında (rotation gibi) Activity field’ları sıfırlanır.
+- Bu “bug” değil, Android’in lifecycle modelinin doğal sonucudur.
+- UI state’in doğru yerde tutulması gerekir (Checkpoint 7: ViewModel’e zemin).
+
+Kapsam (Bilerek Minimal)
+------------------------
+- ViewModel yok
+- Repository / kalıcılık yok
+- Navigation yok
+- Sadece 1 ekran + 1 counter state + rotation senaryosu
+
+Yapılanlar
+----------
+1) UI hazırlandı (activity_main.xml)
+   - TextView: tvCounter  -> “Counter: X” gösterimi
+   - Button : btnInc     -> +1 ile counter arttırma
+   - Bilgilendirici TextView: rotate’da sıfırlanma / state konusu için not
+
+2) MainActivity üzerinde bilerek “state kaybı” üretildi
+   - counter Activity field’ı olarak tutuldu:
+       private var counter: Int = 0
+   - +1 butonu ile counter arttırılıp ekrana render edildi.
+   - Rotation sonrası Activity yeniden yaratıldığı için counter tekrar 0 oldu.
+   - Bu davranış Logcat ile gözlemlendi.
+
+3) Çözüm: onSaveInstanceState ile OS snapshot (geçici state) kullanıldı
+   - Activity ölmeden önce OS’nin verdiği Bundle’a counter yazıldı:
+       outState.putInt("cnt", counter)
+   - Yeni Activity onCreate’ında Bundle’dan geri okundu:
+       counter = savedInstanceState?.getInt("cnt") ?: 0
+   - Böylece rotation sonrası counter değeri korundu.
+
+Önemli Notlar / Kavrayışlar
+---------------------------
+- savedInstanceState (Bundle) = OS-level “snapshot” alanıdır.
+  * Rotation gibi configuration change senaryolarında işe yarar.
+  * Process ölürse (Force stop / OS kill) bu data kalıcı değildir.
+- Kotlin notu:
+  * lateinit yalnızca referans tipler (TextView, Button vb.) içindir.
+  * Int gibi primitive/value type’larda lateinit kullanılamaz.
+
+Test Senaryosu (Beklenen Davranış)
+----------------------------------
+1) Uygulamayı aç
+2) +1’e birkaç kez bas, counter artacak
+3) Ekranı rotate et (portrait <-> landscape)
+4) onSaveInstanceState + Bundle restore sayesinde counter aynı kalacak
+
+Bu Checkpoint’te Bilerek Yapılmayanlar
+--------------------------------------
+- ViewModel kullanımı (Checkpoint 7’de)
+- StateFlow / LiveData
+- Kalıcı kayıt (DataStore/DB/File)
+- Mimari katmanlar
+
+Sonuç
+-----
+Checkpoint 6 sonunda şu ayrım netleşti:
+- “Activity field” = Activity instance RAM’i (rotation’da gider)
+- “savedInstanceState” = OS snapshot (rotation’da geri gelir, kalıcı değildir)
+
+Bir sonraki adım (Checkpoint 7)
+------------------------------
+- ViewModel nedir?
+- savedInstanceState vs ViewModel farkı
+- Counter state’i ViewModel’e taşıma (ekrana ait state’i doğru yerde tutma)
