@@ -18,10 +18,10 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvHint"
+        android:id="@+id/tvLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Rotate ekranı: counter sıfırlanmayacak. ViewModel'e aldık"
+        android:text="Counter 0"
         android:textSize="12sp"
         android:padding="12dp"
         android:layout_marginTop="20dp"
@@ -35,7 +35,7 @@
          android:layout_width="wrap_content"
          android:layout_height="wrap_content"
          android:text="+1"
-         app:layout_constraintTop_toBottomOf="@id/tvHint"
+         app:layout_constraintTop_toBottomOf="@id/tvLabel"
          app:layout_constraintStart_toStartOf="parent"
          app:layout_constraintEnd_toEndOf="parent" />
 

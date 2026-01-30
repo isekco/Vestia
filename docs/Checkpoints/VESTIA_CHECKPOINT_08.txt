@@ -1,0 +1,87 @@
+VESTIA — CHECKPOINT 8
+Topic: StateFlow ile Observable UI State (Derinleştirilmiş)
+Date: 2026-01-30
+Status: CLOSED / BUILD OK
+
+AMAÇ
+Checkpoint 8’in amacı, UI güncellemesini manuel render çağrılarından
+kurtarıp state’i observable hale getirerek, lifecycle-aware ve güvenli
+bir UI-state hattı kurmaktı. Bu checkpoint’te StateFlow yalnızca
+kullanılmadı; doğru, güvenli ve bilinçli şekilde derinlemesine ele alındı.
+
+KAPSAM
+- Tek ekran (MainActivity)
+- ViewModel state sahibi
+- UI yalnızca state’i gözlemler
+- LiveData kullanılmadı
+- Persistence yok (bilerek)
+
+YAPILANLAR
+
+1) StateFlow’a Geçiş
+- ViewModel içinde:
+  - MutableStateFlow internal state holder olarak tanımlandı
+  - StateFlow dış dünyaya read-only olarak açıldı
+- UI artık state’i “çekmiyor”, state’i “dinliyor”.
+
+2) Immutable UiState Modeli
+- UiState bir data class olarak tanımlandı
+- Tüm alanlar val yapıldı (immutable)
+- Yerinde mutation yasaklandı
+- Her state değişimi yeni snapshot üretimiyle yapıldı
+
+3) Snapshot Swap Mantığı
+- State güncellemesi:
+  - copy() veya yeni instance üretimi
+  - ardından _uiState.value = newState
+- Mutable olan state objesi değil, StateFlow’un tuttuğu “current snapshot”tır.
+
+4) Atomic State Update
+- .value = yaklaşımının potansiyel race-condition riski konuşuldu
+- update { } kullanımı tanıtıldı ve uygulandı
+- ViewModel state güncellemeleri atomic hale getirildi
+
+5) Lifecycle-Aware Observation
+- lifecycleScope kullanıldı
+- repeatOnLifecycle(STARTED) ile collect bağlandı
+- UI yalnızca görünürken state dinler
+- STOPPED olduğunda otomatik durur
+- Memory leak ve zombie coroutine riski yok
+
+6) collect vs collectLatest
+- collect: UI state render için doğru seçim
+- collectLatest: event / request / search gibi senaryolar için uygun
+- UI state için collect tercih edildi
+
+7) State ≠ Event Ayrımı
+- State:
+  - Tekrarlanabilir
+  - Ekranın anlık fotoğrafı
+  - StateFlow ile taşınır
+- Event:
+  - Tek seferliktir
+  - Toast, Snackbar, Navigation vb.
+  - StateFlow için uygun değildir
+  - (SharedFlow sonraki checkpoint konusu)
+
+8) Crash Dersi (lateinit)
+- lateinit property findViewById ile initialize edilmediğinde
+  runtime crash oluşacağı gözlemlendi
+- Hatanın Logcat üzerinden nasıl okunacağı öğrenildi
+
+BİLEREK DERİNE GİRİLMEYENLER
+- map / combine / stateIn
+- derived state zincirleri
+- replay / buffer ayarları
+- backpressure detayları
+
+SONUÇ
+Checkpoint 8 sonunda Vestia’da şu model oturmuştur:
+
+- UI = state’in saf yansımasıdır
+- UI state’i değiştirmez, sadece gözlemler
+- State immutable snapshot’lar halinde taşınır
+- StateFlow + lifecycle birlikte güvenli bir UI hattı oluşturur
+- State ve event kavramsal olarak net biçimde ayrılmıştır
+
+Checkpoint 8 burada kapatılmıştır.
