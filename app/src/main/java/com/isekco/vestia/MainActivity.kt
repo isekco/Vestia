@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.launch
+import android.widget.Toast
 import android.util.Log
 
 class MainActivity : ComponentActivity() {
@@ -36,11 +37,26 @@ class MainActivity : ComponentActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { value ->
-                    tvCounter.text = "Counter: ${value.counter}"
-                    tvLabel.text = value.label
+
+                launch {
+                    viewModel.uiState.collect { value ->
+                        tvCounter.text = "Counter: ${value.counter}"
+                        tvLabel.text = value.label
+                    }
+                }
+
+                // 2) EVENT
+                launch {
+                    viewModel.uiEvent.collect { event ->
+                        when (event) {
+                            is UiEvent.ShowToast -> {
+                                Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
                 }
             }
         }
+
     }
 }

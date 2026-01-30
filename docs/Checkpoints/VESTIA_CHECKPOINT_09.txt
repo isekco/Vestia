@@ -1,0 +1,68 @@
+VESTIA — CHECKPOINT 9
+State vs Event Ayrımı (SharedFlow ile One‑Shot UI Events)
+
+Date: 2026-01-30
+Status: CLOSED / BUILD OK (expected)
+
+Amaç
+-----
+Checkpoint 8’de kurulan StateFlow tabanlı observable UI state hattının üzerine,
+“State (sürekli UI fotoğrafı)” ile “Event (tek seferlik sinyal)” ayrımını netleştirip
+event’ler için SharedFlow hattını eklemek.
+
+Bu checkpoint’te kazanım:
+- State tekrar üretilebilir/tekrarlanabilir snapshot’tır (rotation sonrası tekrar render edilir).
+- Event tek seferliktir (Toast/Snackbar/Navigation gibi) ve state içine yazılmamalıdır.
+- Event davranışı (throttle/debounce/coalesce/drop) UX politikasıdır; tek bir “doğru” yoktur.
+- Bu politikalar bilinçli olarak seçilebilir veya ileri bir checkpoint’e ertelenebilir.
+
+Kapsam (Bilinçli Minimal)
+-------------------------
+- Tek ekran (MainActivity)
+- ViewModel state sahibi (StateFlow<UiState>)
+- UI state'i lifecycle-aware şekilde collect eder
+- One-shot event hattı (SharedFlow<UiEvent>)
+- LiveData yok
+- Persistence yok
+- Navigation yok (bilerek)
+
+Uygulanan Tasarım
+-----------------
+1) UiEvent modeli (sealed class)
+   - Payload taşıyabilen event örneği:
+     UiEvent.ShowToast(message: String)
+
+2) ViewModel içinde event stream
+   - private val _events = MutableSharedFlow<UiEvent>()
+   - val events = _events.asSharedFlow()
+
+3) increment() akışı
+   - StateFlow atomic update: _uiState.update { ... }
+   - Event emit: viewModelScope.launch { _events.emit(UiEvent.ShowToast("...")) }
+
+4) Activity tarafı iki ayrı observation hattı
+   - uiState: repeatOnLifecycle(STARTED) { uiState.collect { render(it) } }
+   - events : repeatOnLifecycle(STARTED) { events.collectLatest/collect { handleEvent(it) } }
+
+Beklenen Davranış
+-----------------
+- +1’e basınca counter artar (state)
+- +1’e basınca toast tek seferlik event olarak gösterilir (event)
+- Rotation sonrası:
+  - Counter değeri korunur (state)
+  - Event “state” olmadığı için rotation ile otomatik tekrar etmez (event)
+
+Önemli Not: Event Spam / Kuyruk (UX Politikası)
+-----------------------------------------------
+- Kullanıcı hızlı hızlı peş peşe basarsa event’ler art arda üretilir ve UI’da ardışık toast’lar görülebilir.
+- Bu durum “bug” değil, event hattının doğal sonucudur.
+- Çözüm seçenekleri: throttle-first, debounce, coalesce (batch), drop/replace, tek Toast instance + cancel.
+- Bu checkpoint’te bu politika uygulanmadı; sonraki checkpoint’te UX kararına göre eklenecek.
+
+Sonuç
+-----
+Vestia’da artık iki hat netleşmiştir:
+- StateFlow<UiState>  -> UI’nin tekrar üretilebilir fotoğrafı
+- SharedFlow<UiEvent> -> tek seferlik UI sinyalleri (toast/snackbar/nav)
+
+Checkpoint 9 burada kapatılmıştır.
