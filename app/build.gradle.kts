@@ -41,6 +41,7 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
     implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.coroutines.android)
+    implementation(libs.gson)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

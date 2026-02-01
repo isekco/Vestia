@@ -1,0 +1,5 @@
+[
+  { "id": 1, "description": "Salary",  "amount_str": "50000", "ccy": "TRY" },
+  { "id": 2, "description": "ETF Buy", "amount_str": "-2000", "ccy": "USD" },
+  { "id": 3, "description": "Gold",    "amount_str": "1.5",   "ccy": "XAU" }
+]

@@ -1,17 +1,18 @@
-package com.isekco.vestia
+package com.isekco.vestia.ui
 
 import android.os.Bundle
-import android.os.PersistableBundle
-import androidx.activity.ComponentActivity
-import android.widget.TextView
 import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
+import com.isekco.vestia.CounterViewModel
+import com.isekco.vestia.R
+import com.isekco.vestia.UiEvent
 import kotlinx.coroutines.launch
-import android.widget.Toast
-import android.util.Log
 
 class MainActivity : ComponentActivity() {
 
