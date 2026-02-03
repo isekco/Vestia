@@ -1,0 +1,100 @@
+VESTIA — CHECKPOINT 10 (WIP)
+Topic: JSON-backed Transaction Flow & UI Wiring
+
+Status
+------
+WORK IN PROGRESS
+(Build OK, Checkpoint NOT closed)
+
+Amaç
+-----
+Bu checkpoint’in amacı Netfolio/Vestia için uzun vadeli mimari omurgayı kurmak:
+- Domain / Data / UI ayrımını netleştirmek
+- JSON tabanlı fake data ile uçtan uca bir “vertical slice” çalıştırmak
+- UI’yı sadece state gözlemleyen hale getirmek
+
+Bu checkpoint henüz kapatılmamıştır; yapı bilinçli olarak
+incelenmek ve sindirilmek üzere burada bırakılmıştır.
+
+Genel Mimari
+------------
+UI (Activity / ViewModel)
+   ↓
+UseCase (Domain)
+   ↓
+Repository (Domain interface)
+   ↓
+RepositoryImpl (Data)
+   ↓
+DataSource (Assets JSON)
+
+Domain katmanı:
+- Android bağımlılığı içermez
+- İş dünyasının canonical modellerini tanımlar
+
+Data katmanı:
+- JSON / dış format / parsing detaylarını içerir
+- DTO → Domain mapping burada yapılır
+
+UI katmanı:
+- Sadece state gözlemler ve render eder
+- Data ve parsing detaylarını bilmez
+
+Uygulanan Yapılar
+-----------------
+1) Domain
+- Transaction (domain/model)
+- TransactionRepository (interface)
+- LoadTransactionsUseCase (execute pattern)
+
+2) Data
+- transactions.json (assets)
+- TransactionDto (JSON birebir alanlar)
+- toDomain() mapping (DTO → Domain)
+- AssetsTransactionDataSource (assets okuma)
+- TransactionRepositoryImpl
+  - JSON → DTO list
+  - DTO → Domain list (map/toDomain)
+
+3) Dependency Wiring
+- AppContainer
+  - DataSource → RepositoryImpl → UseCase zinciri
+  - Android Context yalnızca burada kullanılır
+
+4) UI
+- MainUiState (loading / items / error)
+- MainViewModel
+  - StateFlow ile state yönetimi
+  - UseCase üzerinden veri yükleme
+- MainViewModelFactory
+  - ViewModel constructor dependency injection
+- MainActivity
+  - AppContainer’dan factory oluşturma
+  - ViewModel alma
+  - repeatOnLifecycle ile state collect
+  - render(state) ile ekrana basma
+
+Önemli Kavrayışlar
+------------------
+- Domain model UI’nın varlığını bilmez
+- DTO dış formatı temsil eder, domain’i kirletmez
+- Repository interface body içermez; body data katmanındadır
+- map(), List<T> üzerinde çalışan bir dönüşüm mekanizmasıdır
+- Factory (AppContainer), “new” işlemlerini merkezileştirir
+- R sınıfı namespace’e bağlıdır; Activity paketinden bağımsızdır
+
+Bilerek Yapılmayanlar
+--------------------
+- Checkpoint kapatma
+- UI model ayrımı (Domain → UiModel)
+- suspend / IO dispatcher ayrımı
+- Error policy detayları
+- Persistence (DB / DataStore)
+
+Sonraki Adımlar (Checkpoint 10 devamı)
+--------------------------------------
+- Kodların detaylı incelenmesi
+- ViewModel / lifecycle / coroutine soruları
+- Gerekirse küçük refactor’lar
+- Ardından Checkpoint 10 kapatma
+

@@ -1,63 +1,67 @@
 package com.isekco.vestia.ui
-
+import com.isekco.vestia.R
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import com.isekco.vestia.CounterViewModel
-import com.isekco.vestia.R
-import com.isekco.vestia.UiEvent
+import androidx.lifecycle.Lifecycle
+import com.isekco.vestia.di.AppContainer
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
-    private lateinit var tvCounter: TextView
+    private lateinit var tvOutput: TextView
+    private lateinit var btnRefresh: Button
 
-    private lateinit var tvLabel: TextView
-    private lateinit var btnInc: Button
-    private lateinit var viewModel: CounterViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContentView(R.layout.activity_main)
 
-        tvCounter = findViewById(R.id.tvCounter)
-        tvLabel = findViewById(R.id.tvLabel)
-        btnInc = findViewById(R.id.btnInc)
+        tvOutput = findViewById(R.id.tvOutput)
+        btnRefresh = findViewById(R.id.btnRefresh)
 
-        viewModel = ViewModelProvider(this)[CounterViewModel::class.java]
+        // 1) AppContainer: wiring
+        val container = AppContainer(applicationContext)
 
-        btnInc.setOnClickListener {
-            viewModel.increment()
+        // 2) ViewModelFactory: ViewModel'e UseCase enjekte eder
+        val factory = MainViewModelFactory(container.loadTransactionsUseCase)
+
+        // 3) ViewModel'i sistemin mekanizmasıyla al
+        viewModel = ViewModelProvider(this, factory)[MainViewModel::class.java]
+
+        // 4) UI event -> ViewModel niyeti
+        btnRefresh.setOnClickListener {
+            viewModel.load()
         }
 
+        // 5) StateFlow observe -> render
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-
-                launch {
-                    viewModel.uiState.collect { value ->
-                        tvCounter.text = "Counter: ${value.counter}"
-                        tvLabel.text = value.label
-                    }
-                }
-
-                // 2) EVENT
-                launch {
-                    viewModel.uiEvent.collect { event ->
-                        when (event) {
-                            is UiEvent.ShowToast -> {
-                                Toast.makeText(this@MainActivity, event.message, Toast.LENGTH_SHORT).show()
-                            }
-                        }
-                    }
+                viewModel.uiState.collect { state ->
+                    render(state)
                 }
             }
         }
 
+        // İlk yükleme
+        viewModel.load()
+    }
+
+    private fun render(state: MainUiState) {
+        val text = buildString {
+            appendLine("Loading: ${state.isLoading}")
+            state.errorMessage?.let { appendLine("Error: $it") }
+            appendLine("----")
+            state.items.forEach { t ->
+                appendLine("#${t.id} ${t.title}  ${t.amount} ${t.currency}")
+            }
+        }
+        tvOutput.text = text
     }
 }
