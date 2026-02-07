@@ -1,14 +1,14 @@
-package com.isekco.vestia
+package com.isekco.vestia.ui
 
 import android.app.Application
-import android.util.Log
+import com.isekco.vestia.di.AppContainer
 
 class VestiaApp : Application() {
+    lateinit var container: AppContainer
+        private set
 
     override fun onCreate() {
         super.onCreate()
-        // Checkpoint-2: bilinçli olarak boş
-
-        Log.d("VestiaApp", "Application created")
+        container = AppContainer(this)
     }
 }

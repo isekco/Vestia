@@ -1,21 +1,23 @@
 package com.isekco.vestia.di
 
 import android.content.Context
-import com.isekco.vestia.data.datasource.AssetsTransactionDataSource
-import com.isekco.vestia.data.repository.TransactionRepositoryImpl
-import com.isekco.vestia.domain.repository.TransactionRepository
-import com.isekco.vestia.domain.usecase.LoadTransactionsUseCase
+import com.google.gson.Gson
+import com.isekco.vestia.data.repository.AssetsLedgerRepositoryImpl
+import com.isekco.vestia.domain.repository.LedgerRepository
+import com.isekco.vestia.domain.usecase.LoadLedgerUseCase
 
-class AppContainer(
-    appContext: Context
-) {
-    // Android'e bağımlı olan şeyleri burada kuruyoruz (assets okumak gibi).
-    private val transactionDataSource = AssetsTransactionDataSource(appContext)
 
-    // Domain'in istediği interface'i, data katmanındaki impl ile bağlıyoruz.
-    private val transactionRepository: TransactionRepository =
-        TransactionRepositoryImpl(transactionDataSource)
+class AppContainer(appContext: Context) {
 
-    // UseCase, repository interface'i üzerinden çalışır.
-    val loadTransactionsUseCase = LoadTransactionsUseCase(transactionRepository)
+    private val context: Context = appContext.applicationContext
+    private val gson: Gson = Gson()
+
+    val ledgerRepository: LedgerRepository =
+        AssetsLedgerRepositoryImpl(
+            appContext = context,
+            gson = gson,
+            assetFileName = "transactions.json"
+        )
+
+    val loadLedgerUseCase = LoadLedgerUseCase(ledgerRepository)
 }

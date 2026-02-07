@@ -1,0 +1,96 @@
+VESTIA – CHECKPOINT 11
+======================
+
+Konu:
+-----
+JSON tabanlı Ledger altyapısının kurulması, DTO → Domain mapping,
+asset-based transaction modelinin doğrulanması.
+
+Amaç:
+-----
+- Aile / çoklu kişi (AccountOwner) destekli yatırım takibi için
+  sağlam bir veri temeli oluşturmak
+- Transaction’ları ID referansları üzerinden temiz ve güvenli şekilde bağlamak
+- Hesaplanan (derived) alanlar için domain seviyesinde doğrulama yapmak
+
+Yapılanlar:
+-----------
+1. JSON Yapısı
+   - owners      : AccountOwner listesi (id: o1, o2, o3)
+   - accounts    : Account listesi (id: a1..a6, ownerId referanslı)
+   - transactions: Transaction listesi
+       - ownerId / accountId referanslı
+       - assetKey = AssetType | AssetInstrument | UnitType
+       - quantity, unitPrice, totalAmount alanları mevcut
+
+2. Domain Model
+   - Ledger
+   - AccountOwner
+   - Account
+   - Transaction
+   - Enum’lar:
+       - TransactionType
+       - AssetType
+       - UnitType
+
+3. Data Katmanı
+   - LedgerDto tanımlandı
+   - AssetsLedgerRepositoryImpl:
+       - assets/transactions.json dosyasını okur
+       - Gson ile parse eder
+       - DTO → Domain dönüşümünü başlatır
+
+4. Mapper (LedgerMappers)
+   - DTO → Domain dönüşümü manuel ve açık şekilde yazıldı
+   - ownerId / accountId referansları doğrulandı
+   - totalAmount kontrolü:
+       - quantity * unitPrice hesaplanıyor
+       - JSON’daki totalAmount ile fark varsa WARN log basılıyor
+       - crash kaldırıldı, toleranslı davranış eklendi
+
+5. UseCase
+   - LoadLedgerUseCase:
+       - Repository’den Ledger yükler
+       - UI / Application katmanından tamamen izole
+
+6. AppContainer (DI – manuel)
+   - Gson instance
+   - LedgerRepository
+   - LoadLedgerUseCase merkezi olarak oluşturuldu
+
+7. UI (Geçici / Debug Amaçlı)
+   - MainActivity:
+       - Ledger yükleniyor
+       - owners / accounts / transactions sayıları loglanıyor
+       - Pipeline’ın çalıştığı doğrulandı
+       - Henüz kalıcı UI yok (bilinçli)
+
+Çalışma Durumu:
+---------------
+- Uygulama crash etmiyor
+- assets JSON başarıyla okunuyor
+- Mapping ve doğrulamalar çalışıyor
+- totalAmount farkları WARN seviyesinde raporlanıyor
+- Ekran boş (UI henüz tasarlanmadı)
+
+Bilinçli Olarak Yapılmayanlar:
+------------------------------
+- ViewModel / StateFlow
+- Pozisyon (aggregation) hesapları
+- UI tasarımı
+- Persist / write-back mekanizması
+
+Sonuç:
+------
+Checkpoint 11 itibarıyla Vestia için:
+- Veri modeli
+- JSON sözleşmesi
+- Domain doğrulama kuralları
+- Repository + UseCase hattı
+sağlam bir şekilde kurulmuştur.
+
+Bir sonraki adım için uygun zemin hazırdır.
+
+Tarih:
+------
+2026-02-07
