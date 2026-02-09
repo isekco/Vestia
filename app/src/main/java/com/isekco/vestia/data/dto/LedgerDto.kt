@@ -17,7 +17,7 @@ data class AccountDto(
     val id: String,
     val ownerId: String,
     val name: String,
-    val baseCurrency: String
+    val currency: String
 )
 
 data class TransactionDto(
@@ -35,7 +35,9 @@ data class TransactionDto(
     // Precision için JSON’da string tutuyoruz:
     val quantity: String,
     val unitPrice: String,
-    val totalAmount: String?,
+
+    // unitPrice hangi para biriminde girildi?
+    val priceCurrency: String,
 
     val tags: String?
 )

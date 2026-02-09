@@ -1,0 +1,70 @@
+VESTIA — CHECKPOINT 12
+======================
+
+Konu:
+-----
+Ledger sözleşmesinin netleştirilmesi, para birimi (currency) kavramlarının ayrıştırılması
+ve BigDecimal tabanlı hesaplama altyapısının kurulması.
+
+Amaç:
+-----
+- JSON / DTO / Domain sınırlarını netleştirmek
+- Raporlama para birimi ile hesap/işlem para birimlerini kavramsal olarak ayırmak
+- Finansal hesaplamalar için güvenli ve deterministik bir temel oluşturmak
+
+Alınan Temel Kararlar:
+---------------------
+1) Para Birimi Ayrımı
+- Ledger.baseCurrency:
+  * Raporlama / konsolidasyon para birimi
+  * Tüm UI ve toplam hesapların referansı
+- Account.currency:
+  * Hesabın native / settlement para birimi
+- Transaction.priceCurrency:
+  * unitPrice değerinin girildiği para birimi
+
+2) JSON Sözleşmesi
+- Finansal alanlar (quantity, unitPrice) JSON tarafında string tutulur
+- epochMs numeric (Long) olarak kalır
+- totalAmount JSON input değildir (derived)
+
+3) BigDecimal Politikası
+- DTO -> Domain geçişinde quantity ve unitPrice BigDecimal’a çevrilir
+- Domain hesaplamaları BigDecimal ile yapılır
+- Hesaplama scale: 10
+- RoundingMode: HALF_UP
+- Domain katmanında formatlama yapılmaz
+
+4) Domain Model Temizliği
+- Currency, TransactionType, AssetType, UnitType enum’ları tek yerde (Enums.kt)
+- unitType ve assetType JSON’daki yerel ifadelerden mapper’da normalize edilir
+- Domain yalnızca kanonik, açık anlamlı enum’lar içerir
+
+5) Mapper Sorumlulukları
+- String -> Enum dönüşümleri
+- String -> BigDecimal dönüşümleri
+- ownerId / accountId referans doğrulaması
+- owner-account tutarlılık kontrolü
+- JSON kaynaklı kirli verinin domain’e sızmasının engellenmesi
+
+Durum:
+------
+- Build OK
+- Run OK
+- Crash yok
+- UI bilinçli olarak boş
+- Ledger pipeline uçtan uca çalışır durumda
+
+Sonuç:
+------
+Checkpoint 12 itibarıyla Vestia için:
+- Veri sözleşmesi netleşmiş
+- Para birimi kavramları ayrıştırılmış
+- Hesaplama altyapısı güvenli hale getirilmiş
+- Domain / Data sınırı sağlamlaştırılmıştır
+
+Bir Sonraki Adım:
+-----------------
+Checkpoint 13:
+- Aggregation / Position / Balance hesapları
+- Ledger üzerinden türetilmiş (derived) finansal görünümler

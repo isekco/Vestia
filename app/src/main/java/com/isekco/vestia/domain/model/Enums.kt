@@ -1,9 +1,40 @@
 package com.isekco.vestia.domain.model
 
+enum class Currency {
+    TRY,
+    USD,
+    EUR,
+    GBP
+}
 enum class TransactionType {
-    BUY, SELL, GIFT_IN, GIFT_OUT
+    BUY,
+    SELL,
+    DEPOSIT,
+    WITHDRAW,
+    GIFT_IN,
+    GIFT_OUT
 }
 
 enum class AssetType {
-    TRY, USD, EUR, GBP, XAU, FUND, STOCK
+    STOCK,   // Hisse
+    FUND,    // Yatırım fonu
+    XAU,     // Altın (generic)
+    CASH,    // Nakit (TRY, USD, EUR vs)
+    FX       // Döviz işlemleri (opsiyonel, ileride)
+}
+
+enum class UnitType {
+
+    // Adet bazlı
+    SHARE,        // Hisse adedi
+    FUND_SHARE,   // Fon payı
+
+    // Ağırlık
+    GRAM,         // Altın (gram)
+    OUNCE,        // Ons (ileride)
+
+    // Para birimi bazlı
+    TRY,
+    USD,
+    EUR
 }

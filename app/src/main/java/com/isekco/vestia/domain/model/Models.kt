@@ -11,7 +11,7 @@ data class Account(
     val id: String,
     val ownerId: String,
     val name: String,
-    val baseCurrency: String // şimdilik string kalsın (TRY)
+    val currency: Currency // hesabın native/settlement para birimi
 )
 
 data class Transaction(
@@ -23,21 +23,32 @@ data class Transaction(
     val transactionType: TransactionType,
 
     val assetType: AssetType,
-    val assetInstrument: String, // string kalsın
-    val unitType: String,        // "TRY", "USD", "g", "adet", "pay"
+    val assetInstrument: String,
 
+    // JSON’da "adet", "g", "pay" vs geliyor; domain’de enum olsun.
+    val unitType: UnitType,
+
+    // JSON’da string, domain’de BigDecimal
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
-    val totalAmount: BigDecimal?, // opsiyonel; istersen zorunluya çekersin
+
+    // unitPrice hangi para biriminde girildi?
+    val priceCurrency: Currency,
 
     val tags: String?
 ) {
-    // JSON/DB’de tutmuyoruz; derived:
+    // Derived: input değil
+    val totalAmount: BigDecimal
+        get() = quantity.multiply(unitPrice)
+
+    // Derived:
     val assetKey: String
-        get() = "${assetType.name}|$assetInstrument|$unitType"
+        get() = "${assetType.name}|$assetInstrument|${unitType.name}"
 }
 
 data class Ledger(
+    val schemaVersion: Int,
+    val baseCurrency: Currency, // raporlama para birimi (root)
     val owners: List<Owner>,
     val accounts: List<Account>,
     val transactions: List<Transaction>

@@ -9,19 +9,19 @@
   ],
 
   "accounts": [
-    { "id": "a1", "ownerId": "o1", "name": "Garanti Yatırım", "baseCurrency": "TRY" },
-    { "id": "a2", "ownerId": "o1", "name": "Ziraat Bankası",  "baseCurrency": "TRY" },
+    { "id": "a1", "ownerId": "o1", "name": "Garanti Yatırım", "currency": "TRY" },
+    { "id": "a2", "ownerId": "o1", "name": "Ziraat Bankası",  "currency": "TRY" },
 
-    { "id": "a3", "ownerId": "o2", "name": "İş Bankası",      "baseCurrency": "TRY" },
-    { "id": "a4", "ownerId": "o2", "name": "Akbank",          "baseCurrency": "TRY" },
+    { "id": "a3", "ownerId": "o2", "name": "İş Bankası",      "currency": "TRY" },
+    { "id": "a4", "ownerId": "o2", "name": "Akbank",          "currency": "TRY" },
 
-    { "id": "a5", "ownerId": "o3", "name": "QNB Finans",      "baseCurrency": "TRY" },
-    { "id": "a6", "ownerId": "o3", "name": "Vakıfbank",       "baseCurrency": "TRY" }
+    { "id": "a5", "ownerId": "o3", "name": "QNB Finans",      "currency": "TRY" },
+    { "id": "a6", "ownerId": "o3", "name": "Vakıfbank",       "currency": "TRY" }
   ],
 
   "transactions": [
     {
-      "id": "t_001",
+      "id": "t_0001",
       "ownerId": "o1",
       "accountId": "a1",
       "epochMs": 1735689600000,
@@ -31,11 +31,11 @@
       "unitType": "adet",
       "quantity": "10",
       "unitPrice": "245.7500000000",
-      "totalAmount": "2457.5000000000",
+      "priceCurrency": "TRY",
       "tags": "uzun vade"
     },
     {
-      "id": "t_002",
+      "id": "t_0002",
       "ownerId": "o1",
       "accountId": "a2",
       "epochMs": 1735948800000,
@@ -45,11 +45,11 @@
       "unitType": "g",
       "quantity": "15.25",
       "unitPrice": "1985.1200000000",
-      "totalAmount": "30273.0800000000",
+      "priceCurrency": "TRY",
       "tags": "fiziki altın"
     },
     {
-      "id": "t_003",
+      "id": "t_0003",
       "ownerId": "o2",
       "accountId": "a3",
       "epochMs": 1736208000000,
@@ -59,11 +59,11 @@
       "unitType": "pay",
       "quantity": "120.456",
       "unitPrice": "32.4500000000",
-      "totalAmount": "3908.8002000000",
+      "priceCurrency": "TRY",
       "tags": "emeklilik fonu"
     },
     {
-      "id": "t_004",
+      "id": "t_0004",
       "ownerId": "o2",
       "accountId": "a4",
       "epochMs": 1736467200000,
@@ -73,11 +73,11 @@
       "unitType": "USD",
       "quantity": "1500",
       "unitPrice": "30.1250000000",
-      "totalAmount": "45187.5000000000",
+      "priceCurrency": "TRY",
       "tags": "kur koruma"
     },
     {
-      "id": "t_005",
+      "id": "t_0005",
       "ownerId": "o3",
       "accountId": "a5",
       "epochMs": 1736726400000,
@@ -87,11 +87,11 @@
       "unitType": "EUR",
       "quantity": "850",
       "unitPrice": "32.8500000000",
-      "totalAmount": "27922.5000000000",
+      "priceCurrency": "TRY",
       "tags": "yurtdışı seyahat"
     },
     {
-      "id": "t_006",
+      "id": "t_0006",
       "ownerId": "o3",
       "accountId": "a6",
       "epochMs": 1736985600000,
@@ -101,11 +101,11 @@
       "unitType": "adet",
       "quantity": "20",
       "unitPrice": "54.3000000000",
-      "totalAmount": "1086.0000000000",
+      "priceCurrency": "TRY",
       "tags": "kâr realizasyonu"
     },
     {
-      "id": "t_007",
+      "id": "t_0007",
       "ownerId": "o1",
       "accountId": "a1",
       "epochMs": 1737244800000,
@@ -115,11 +115,11 @@
       "unitType": "TRY",
       "quantity": "5000",
       "unitPrice": "1.0000000000",
-      "totalAmount": "5000.0000000000",
+      "priceCurrency": "TRY",
       "tags": "aile desteği"
     },
     {
-      "id": "t_008",
+      "id": "t_0008",
       "ownerId": "o2",
       "accountId": "a3",
       "epochMs": 1737504000000,
@@ -129,7 +129,7 @@
       "unitType": "TRY",
       "quantity": "5000",
       "unitPrice": "1.0000000000",
-      "totalAmount": "5000.0000000000",
+      "priceCurrency": "TRY",
       "tags": "ismet'ten"
     }
   ]
