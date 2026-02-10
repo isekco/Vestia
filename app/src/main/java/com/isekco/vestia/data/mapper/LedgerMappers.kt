@@ -3,26 +3,27 @@ package com.isekco.vestia.data.mapper
 import com.isekco.vestia.data.dto.*
 import com.isekco.vestia.domain.model.*
 import java.math.BigDecimal
-import java.math.RoundingMode
+import java.util.Locale
 
 /**
- * DTO (JSON/storage format) -> Domain (iş modeli) dönüşümleri.
+ * DTO (JSON/storage format) -> Domain (business model) mappers.
  *
- * Kurallar (Checkpoint 12):
- * - Ledger.baseCurrency root’tan gelir (raporlama baz para)
- * - Account.currency hesabın para birimidir (settlement/native)
- * - Transaction.priceCurrency unitPrice’ın para birimidir
- * - quantity/unitPrice JSON’da string, domain’de BigDecimal
- * - totalAmount JSON input değildir; domain’de derived/computed
+ * Design:
+ * - Single entry point: [LedgerDto.toDomain].
+ * - All other mapping helpers are private to prevent partial/inconsistent mappings.
+ *
+ * Notes:
+ * - Ledger.baseCurrency comes from the root and represents reporting base currency.
+ * - Account.currency is the account's native/settlement currency.
+ * - Transaction.priceCurrency is the currency of unitPrice.
+ * - JSON fields like quantity/unitPrice may be stored as String; domain uses BigDecimal.
+ * - Derived values (e.g., totalAmount, assetKey, direction) are computed in domain, not stored in JSON.
  */
-private const val CALC_SCALE = 10
-private val CALC_ROUNDING = RoundingMode.HALF_UP
-
-fun LedgerDto.toDomain(): Ledger {
-    val ownersDomain: List<Owner> = owners.map { it.toDomain() }
+internal fun LedgerDto.toDomain(): Ledger {
+    val ownersDomain: List<Owner> = owners.map {it.toDomain() }
     val accountsDomain: List<Account> = accounts.map { it.toDomain() }
 
-    // Lookup yapıları (filtreleme ve doğrulama için)
+    // Lookup structures for validation and fast joins.
     val ownerIds: Set<String> = ownersDomain.map { it.id }.toSet()
     val accountsById: Map<String, Account> = accountsDomain.associateBy { it.id }
 
@@ -35,30 +36,33 @@ fun LedgerDto.toDomain(): Ledger {
 
     return Ledger(
         schemaVersion = schemaVersion,
-        baseCurrency = parseEnumNormalized<Currency>(raw = baseCurrency, fieldName = "baseCurrency", ctx = "ledger"),
+        baseCurrency = parseEnumNormalized(raw = baseCurrency, fieldName = "baseCurrency", ctx = "ledger"),
         owners = ownersDomain,
         accounts = accountsDomain,
         transactions = transactionsDomain
     )
 }
 
-fun OwnerDto.toDomain(): Owner {
-    require(id.isNotBlank()) { "Owner.id boş olamaz" }
-    require(name.isNotBlank()) { "Owner.name boş olamaz (ownerId=$id)" }
+/**
+ * Maps [OwnerDto] into [Owner].
+ */
+private fun OwnerDto.toDomain(): Owner {
+    require(id.isNotBlank()) { "Owner.id must not be blank" }
+    require(name.isNotBlank()) { "Owner.name must not be blank (ownerId=$id)" }
     return Owner(
         id = id,
         name = name
     )
 }
 
-fun AccountDto.toDomain(): Account {
-    require(id.isNotBlank()) { "Account.id boş olamaz" }
-    require(ownerId.isNotBlank()) { "Account.ownerId boş olamaz (accountId=$id)" }
-    require(name.isNotBlank()) { "Account.name boş olamaz (accountId=$id)" }
-
-    // JSON’da alan adı artık "currency" olmalı.
-    // Eğer DTO’yu henüz değiştirmediysen, buradaki property adını da ona göre güncelle.
-    require(currency.isNotBlank()) { "Account.currency boş olamaz (accountId=$id)" }
+/**
+ * Maps [AccountDto] into [Account].
+ */
+private fun AccountDto.toDomain(): Account {
+    require(id.isNotBlank()) { "Account.id must not be blank" }
+    require(ownerId.isNotBlank()) { "Account.ownerId must not be blank (accountId=$id)" }
+    require(name.isNotBlank()) { "Account.name must not be blank (accountId=$id)" }
+    require(currency.isNotBlank()) { "Account.currency must not be blank (accountId=$id)" }
 
     val cur: Currency =
         parseEnumNormalized(raw = currency, fieldName = "currency", ctx = "accountId=$id")
@@ -72,31 +76,32 @@ fun AccountDto.toDomain(): Account {
 }
 
 /**
- * TransactionDto -> Transaction (Domain)
+ * Maps [TransactionDto] into [Transaction].
  *
- * Kontroller:
- * 1) Alan doğrulama (blank / epochMs)
- * 2) Referans doğrulama (ownerId mevcut mu, accountId mevcut mu, owner-account tutarlı mı)
+ * Validation performed here:
+ * 1) Field-level validation (blank fields, epochMs)
+ * 2) Reference validation (owner exists, account exists, and account belongs to owner)
  */
-fun TransactionDto.toDomain(
+private fun TransactionDto.toDomain(
     ownerIds: Set<String>,
     accountsById: Map<String, Account>
 ): Transaction {
-    require(id.isNotBlank()) { "Transaction.id boş olamaz" }
-    require(ownerId.isNotBlank()) { "Transaction.ownerId boş olamaz (txId=$id)" }
-    require(accountId.isNotBlank()) { "Transaction.accountId boş olamaz (txId=$id)" }
-    require(epochMs > 0L) { "Transaction.epochMs pozitif olmalı (txId=$id)" }
+    require(id.isNotBlank()) { "Transaction.id must not be blank" }
+    require(ownerId.isNotBlank()) { "Transaction.ownerId must not be blank (txId=$id)" }
+    require(accountId.isNotBlank()) { "Transaction.accountId must not be blank (txId=$id)" }
+    require(epochMs > 0L) { "Transaction.epochMs must be positive (txId=$id)" }
+    require(assetInstrument.isNotBlank()) { "Transaction.assetInstrument must not be blank (txId=$id)" }
 
     require(ownerIds.contains(ownerId)) {
-        "Transaction.ownerId bulunamadı: ownerId=$ownerId (txId=$id)"
+        "Unknown Transaction.ownerId: ownerId=$ownerId (txId=$id)"
     }
 
     val account: Account = accountsById[accountId]
-        ?: error("Transaction.accountId bulunamadı: accountId=$accountId (txId=$id)")
+        ?: error("Unknown Transaction.accountId: accountId=$accountId (txId=$id)")
 
-    // tx.ownerId, filtre kolaylığı için var => account.ownerId ile tutarlı mı?
+    // tx.ownerId is kept for easy filtering; ensure it matches the account owner.
     require(account.ownerId == ownerId) {
-        "Transaction ownerId/accountId tutarsız: tx.ownerId=$ownerId, account.ownerId=${account.ownerId} (txId=$id)"
+        "Owner/account mismatch: tx.ownerId=$ownerId, account.ownerId=${account.ownerId} (txId=$id)"
     }
 
     val txType: TransactionType =
@@ -109,17 +114,16 @@ fun TransactionDto.toDomain(
         parseUnitType(raw = unitType, ctx = "txId=$id")
 
     val qty: BigDecimal =
-        parseBigDecimalScaled(raw = quantity, fieldName = "quantity", ctx = "txId=$id")
-    val price: BigDecimal =
-        parseBigDecimalScaled(raw = unitPrice, fieldName = "unitPrice", ctx = "txId=$id")
+        parseBigDecimal(raw = quantity, fieldName = "quantity", ctx = "txId=$id")
 
-    // unitPrice hangi para biriminde?
+    val price: BigDecimal =
+        parseBigDecimal(raw = unitPrice, fieldName = "unitPrice", ctx = "txId=$id")
+
     val pCur: Currency =
         parseEnumNormalized(raw = priceCurrency, fieldName = "priceCurrency", ctx = "txId=$id")
 
-    // Basit doğrulamalar (Checkpoint 12 sınırında)
-    require(qty > BigDecimal.ZERO) { "quantity 0'dan büyük olmalı (txId=$id)" }
-    require(price >= BigDecimal.ZERO) { "unitPrice negatif olamaz (txId=$id)" }
+    require(qty > BigDecimal.ZERO) { "quantity must be > 0 (txId=$id)" }
+    require(price >= BigDecimal.ZERO) { "unitPrice must be >= 0 (txId=$id)" }
 
     return Transaction(
         id = id,
@@ -141,28 +145,36 @@ fun TransactionDto.toDomain(
     )
 }
 
-/* --------------------------
-   Helpers (manuel, küçük)
-   -------------------------- */
+/* -------------------------------------------------------------------------
+ * Helpers
+ * ------------------------------------------------------------------------- */
 
-private fun parseBigDecimalScaled(
+/**
+ * Parses a BigDecimal from a raw String.
+ *
+ * We intentionally do NOT enforce any fixed scale here.
+ * Formatting/rounding is a presentation/reporting concern.
+ */
+private fun parseBigDecimal(
     raw: String,
     fieldName: String,
     ctx: String
 ): BigDecimal {
     val s = raw.trim()
-    require(s.isNotEmpty()) { "$fieldName boş olamaz ($ctx)" }
+    require(s.isNotEmpty()) { "$fieldName must not be blank ($ctx)" }
     return try {
-        BigDecimal(s).setScale(CALC_SCALE, CALC_ROUNDING)
+        BigDecimal(s)
     } catch (e: NumberFormatException) {
-        error("$fieldName BigDecimal parse edilemedi: '$raw' ($ctx)")
+        error("$fieldName cannot be parsed as BigDecimal: '$raw' ($ctx)")
     }
 }
 
 /**
- * JSON'dan gelen enum stringlerini normalize ediyoruz:
- * - trim
- * - uppercase (TR locale problemlerini önlemek için Locale.ROOT ile)
+ * Normalizes and parses enum values coming from JSON.
+ *
+ * Normalization rules:
+ * - trim()
+ * - uppercase(Locale.ROOT) to avoid locale-specific issues (e.g., Turkish i/I)
  */
 private inline fun <reified T : Enum<T>> parseEnumNormalized(
     raw: String,
@@ -170,53 +182,60 @@ private inline fun <reified T : Enum<T>> parseEnumNormalized(
     ctx: String
 ): T {
     val s = raw.trim()
-    require(s.isNotEmpty()) { "$fieldName boş olamaz ($ctx)" }
-    val normalized = s.uppercase(java.util.Locale.ROOT)
+    require(s.isNotEmpty()) { "$fieldName must not be blank ($ctx)" }
+    val normalized = s.uppercase(Locale.ROOT)
     return try {
         enumValueOf<T>(normalized)
     } catch (e: IllegalArgumentException) {
         val allowed = enumValues<T>().joinToString(", ") { it.name }
-        error("$fieldName enum parse edilemedi: '$raw' ($ctx). Allowed: $allowed")
+        error("$fieldName cannot be parsed as enum: '$raw' ($ctx). Allowed: $allowed")
     }
 }
 
+/**
+ * Maps incoming unit strings to [UnitType].
+ *
+ * Keep this mapping conservative and explicit; unknown values should fail fast.
+ */
 private fun parseUnitType(
     raw: String,
     ctx: String
 ): UnitType {
-    val s = raw.trim().lowercase()
-    require(s.isNotEmpty()) { "unitType boş olamaz ($ctx)" }
+    val s = raw.trim().lowercase(Locale.ROOT)
+    require(s.isNotEmpty()) { "unitType must not be blank ($ctx)" }
 
     return when (s) {
-
-        // Ağırlık
+        // Weight
         "g", "gram" -> UnitType.GRAM
         "ons", "ounce" -> UnitType.OUNCE
 
-        // Para birimi bazlı
+        // Currency-like unit labels (if your JSON provides these as unit)
         "try" -> UnitType.TRY
         "usd" -> UnitType.USD
         "eur" -> UnitType.EUR
         "gbp" -> UnitType.GBP
 
-        else -> error("unitType tanınmıyor: '$raw' ($ctx)")
+        else -> error("Unknown unitType: '$raw' ($ctx)")
     }
 }
 
+/**
+ * Maps incoming asset type strings to [AssetType].
+ *
+ * Notes:
+ * - XAU is explicitly treated as gold.
+ * - If JSON sends currencies as assetType (TRY/USD/EUR/GBP), we map them to CASH.
+ */
 private fun parseAssetType(
     raw: String,
     ctx: String
 ): AssetType {
-    val s = raw.trim().uppercase()
-    require(s.isNotEmpty()) { "assetType boş olamaz ($ctx)" }
+    val s = raw.trim().uppercase(Locale.ROOT)
+    require(s.isNotEmpty()) { "assetType must not be blank ($ctx)" }
 
     return when (s) {
-
-        "XAU"   -> AssetType.XAU
-
-        // JSON’da USD / EUR assetType olarak gelmiş
+        "XAU" -> AssetType.XAU
         "TRY", "USD", "EUR", "GBP" -> AssetType.CASH
-
-        else -> error("assetType tanınmıyor: '$raw' ($ctx)")
+        else -> error("Unknown assetType: '$raw' ($ctx)")
     }
 }

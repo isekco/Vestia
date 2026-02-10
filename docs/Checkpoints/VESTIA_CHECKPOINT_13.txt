@@ -1,0 +1,66 @@
+VESTIA – CHECKPOINT 13
+=====================
+
+Kapsam
+------
+Bu checkpoint’te Ledger → Domain dönüşüm hattı (Mapper) detaylı şekilde ele alındı
+ve mimari kararlar netleştirildi. Amaç, DTO’dan gelen ham verinin Domain’e
+tutarlı, güvenli ve deterministik şekilde aktarılmasıydı.
+
+Tamamlanan Başlıklar
+--------------------
+1. DTO → Domain Mapper mimarisi
+   - Tek entry-point yaklaşımı benimsendi:
+     - Sadece LedgerDto.toDomain() dışarıya açık
+     - OwnerDto / AccountDto / TransactionDto dönüşümleri private tutuldu
+   - Mapper, domain’e giden tek kapı olarak konumlandırıldı
+
+2. Transaction doğrulama (validation)
+   - ownerId varlık kontrolü (Set<String>)
+   - accountId varlık kontrolü (Map<String, Account>)
+   - owner–account tutarlılık kontrolü
+   - epochMs, quantity, unitPrice gibi alanlarda fail-fast validation
+
+3. Collection API kavrayışı
+   - map / it / lambda parametreleri netleştirildi
+   - Set:
+     - Kimlik (ID) doğrulama için kullanıldı
+     - Duplicate’lerin otomatik elenmesi bilinçli tercih edildi
+   - Map:
+     - ID → nesne erişimi için kullanıldı
+     - associateBy ile List → Map dönüşümü benimsendi
+
+4. associateBy ve toSet kullanımı
+   - toSet(): List → Set (unique değerler)
+   - associateBy { key }: List → Map (key → object)
+   - Her iki yapının neden ve nerede kullanıldığı netleştirildi
+
+5. Parsing & Guard yaklaşımı
+   - JSON’un “güvenilmez kaynak” olduğu varsayıldı
+   - Mapper katmanında:
+     - normalize
+     - parse
+     - validate
+     birlikte yapıldı
+   - UI tarafında ileride önleyici kontroller yapılacak olsa bile,
+     mapper’daki guard’lar korunacak
+
+6. Kod okunabilirliği kararları
+   - Kritik lambda’larda `it` yerine anlamlı parametre isimleri (dto) tercih edildi
+   - Mapper kodu bilinçli olarak “idiomatic kısalık” yerine
+     “açık ve izlenebilir” yazıldı
+
+Genel Değerlendirme
+-------------------
+- Mapper katmanı, Vestia domain’inin en deterministik ve güvenilir noktası olarak
+  netleşti.
+- DTO → Domain dönüşüm zinciri artık tamamen anlaşılır ve izlenebilir durumda.
+- Bu checkpoint ile birlikte domain’e giren verinin bütünlüğü garanti altına alındı.
+
+Sonraki Adımlar (Checkpoint 14)
+--------------------------------
+- Repository katmanının mapper üstüne oturtulması
+- Domain verisinin UI/ViewModel tarafına taşınması
+- Hesap/transaction bazlı ilk okuma senaryoları
+
+Checkpoint 13 burada bilinçli olarak kapatılmıştır.

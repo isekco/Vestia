@@ -17,18 +17,13 @@ data class TransactionDto(
     val ownerId: String,
     val accountId: String,
     val epochMs: Long,
-
     val transactionType: String,
-
     val assetType: String,
     val assetInstrument: String,
     val unitType: String,
-
     val quantity: String,
     val unitPrice: String,
-
     val priceCurrency: String,
-
     val tags: String?
 )
 
