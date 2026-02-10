@@ -1,13 +1,5 @@
 package com.isekco.vestia.data.dto
 
-data class LedgerDto(
-    val schemaVersion: Int,
-    val baseCurrency: String,
-    val owners: List<OwnerDto>,
-    val accounts: List<AccountDto>,
-    val transactions: List<TransactionDto>
-)
-
 data class OwnerDto(
     val id: String,
     val name: String
@@ -32,12 +24,18 @@ data class TransactionDto(
     val assetInstrument: String,
     val unitType: String,
 
-    // Precision için JSON’da string tutuyoruz:
     val quantity: String,
     val unitPrice: String,
 
-    // unitPrice hangi para biriminde girildi?
     val priceCurrency: String,
 
     val tags: String?
+)
+
+data class LedgerDto(
+    val schemaVersion: Int,
+    val baseCurrency: String,
+    val owners: List<OwnerDto>,
+    val accounts: List<AccountDto>,
+    val transactions: List<TransactionDto>
 )

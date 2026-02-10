@@ -6,29 +6,26 @@ enum class Currency {
     EUR,
     GBP
 }
-enum class TransactionType {
-    BUY,
-    SELL,
-    DEPOSIT,
-    WITHDRAW,
-    GIFT_IN,
-    GIFT_OUT
+enum class TransactionDirection {
+    IN,
+    OUT
+}
+
+enum class TransactionType(val direction: TransactionDirection) {
+    BUY(TransactionDirection.IN),
+    SELL(TransactionDirection.OUT),
+    GIFT_IN(TransactionDirection.IN),
+    GIFT_OUT(TransactionDirection.OUT)
 }
 
 enum class AssetType {
-    STOCK,   // Hisse
-    FUND,    // Yatırım fonu
+
     XAU,     // Altın (generic)
     CASH,    // Nakit (TRY, USD, EUR vs)
     FX       // Döviz işlemleri (opsiyonel, ileride)
 }
 
 enum class UnitType {
-
-    // Adet bazlı
-    SHARE,        // Hisse adedi
-    FUND_SHARE,   // Fon payı
-
     // Ağırlık
     GRAM,         // Altın (gram)
     OUNCE,        // Ons (ileride)
@@ -36,5 +33,6 @@ enum class UnitType {
     // Para birimi bazlı
     TRY,
     USD,
-    EUR
+    EUR,
+    GBP
 }

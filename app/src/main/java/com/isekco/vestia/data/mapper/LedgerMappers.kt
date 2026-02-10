@@ -87,12 +87,10 @@ fun TransactionDto.toDomain(
     require(accountId.isNotBlank()) { "Transaction.accountId boş olamaz (txId=$id)" }
     require(epochMs > 0L) { "Transaction.epochMs pozitif olmalı (txId=$id)" }
 
-    // Owner var mı?
     require(ownerIds.contains(ownerId)) {
         "Transaction.ownerId bulunamadı: ownerId=$ownerId (txId=$id)"
     }
 
-    // Account var mı?
     val account: Account = accountsById[accountId]
         ?: error("Transaction.accountId bulunamadı: accountId=$accountId (txId=$id)")
 
@@ -190,9 +188,6 @@ private fun parseUnitType(
     require(s.isNotEmpty()) { "unitType boş olamaz ($ctx)" }
 
     return when (s) {
-        // Hisse / pay
-        "adet" -> UnitType.SHARE
-        "pay"  -> UnitType.FUND_SHARE
 
         // Ağırlık
         "g", "gram" -> UnitType.GRAM
@@ -202,6 +197,7 @@ private fun parseUnitType(
         "try" -> UnitType.TRY
         "usd" -> UnitType.USD
         "eur" -> UnitType.EUR
+        "gbp" -> UnitType.GBP
 
         else -> error("unitType tanınmıyor: '$raw' ($ctx)")
     }
@@ -215,12 +211,11 @@ private fun parseAssetType(
     require(s.isNotEmpty()) { "assetType boş olamaz ($ctx)" }
 
     return when (s) {
-        "STOCK" -> AssetType.STOCK
-        "FUND"  -> AssetType.FUND
+
         "XAU"   -> AssetType.XAU
 
         // JSON’da USD / EUR assetType olarak gelmiş
-        "TRY", "USD", "EUR" -> AssetType.CASH
+        "TRY", "USD", "EUR", "GBP" -> AssetType.CASH
 
         else -> error("assetType tanınmıyor: '$raw' ($ctx)")
     }

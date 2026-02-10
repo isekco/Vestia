@@ -24,24 +24,21 @@ data class Transaction(
 
     val assetType: AssetType,
     val assetInstrument: String,
-
-    // JSON’da "adet", "g", "pay" vs geliyor; domain’de enum olsun.
     val unitType: UnitType,
 
-    // JSON’da string, domain’de BigDecimal
     val quantity: BigDecimal,
     val unitPrice: BigDecimal,
-
-    // unitPrice hangi para biriminde girildi?
     val priceCurrency: Currency,
 
     val tags: String?
 ) {
-    // Derived: input değil
-    val totalAmount: BigDecimal
-        get() = quantity.multiply(unitPrice)
 
-    // Derived:
+    val direction: TransactionDirection
+        get() = transactionType.direction
+
+    val totalAmount: BigDecimal
+        get() = quantity.multiply(unitPrice) // quantity * unitPrice
+
     val assetKey: String
         get() = "${assetType.name}|$assetInstrument|${unitType.name}"
 }
