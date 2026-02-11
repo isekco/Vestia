@@ -1,0 +1,69 @@
+VESTIA – CHECKPOINT 14
+======================
+
+Konu:
+-----
+LedgerRepository katmanına in-memory cache mekanizmasının eklenmesi
+ve veri okuma sorumluluğunun DataSource’a ayrıştırılması.
+
+Amaç:
+-----
+- Ledger’ın uygulama yaşam döngüsü boyunca tek sefer okunmasını sağlamak
+- Repository’yi Single Source of Truth haline getirmek
+- JSON tekrar tekrar parse edilmesini engellemek
+- Katman sorumluluklarını netleştirmek
+
+Yapılan Değişiklikler:
+----------------------
+
+1) LedgerRepository Interface Güncellemesi
+   - loadLedger() kaldırıldı
+   - getLedger(forceRefresh: Boolean) eklendi
+   - invalidate() eklendi
+
+2) LedgerDataSource Oluşturuldu
+   - Context bağımlılığı repository’den çıkarıldı
+   - assets dosyası okuma işlemi DataSource’a taşındı
+   - Repository artık dosya sistemi bilmez
+
+3) LedgerRepositoryImpl Refactor
+   - In-memory cache eklendi (private var cached: Ledger?)
+   - Double-load engellemek için synchronized + volatile kullanıldı
+   - forceRefresh parametresi ile kontrollü yeniden yükleme sağlandı
+
+4) LoadLedgerUseCase Güncellendi
+   - Artık repository.getLedger() çağırıyor
+   - JSON tekrar okunmuyor
+
+5) DI (AppContainer) Güncellemesi
+   - LedgerDataSource oluşturuluyor
+   - LedgerRepositoryImpl DataSource + Gson ile kuruluyor
+   - Container Application scope’ta tek instance olarak tutuluyor
+
+Mimari Sonuç:
+-------------
+- Repository artık Ledger’ın tek sahibi
+- JSON yalnızca ilk çağrıda okunur
+- UseCase’ler Ledger parametresi taşımaz
+- ViewModel cache yönetimi bilmez
+- Katmanlar arası sorumluluk netleşmiştir
+
+Durum:
+------
+Build OK
+Run OK
+Cache mekanizması aktif
+JSON yalnızca ilk erişimde okunur
+
+Sonraki Adım:
+-------------
+Checkpoint 15:
+- PositionEngine
+- Aggregation / Weighted Average Cost
+- Derived domain modeller
+
+Checkpoint 14 burada bilinçli olarak kapatılmıştır.
+
+Tarih:
+------
+2026-02-11

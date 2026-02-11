@@ -6,7 +6,6 @@ import com.isekco.vestia.domain.repository.LedgerRepository
 class LoadLedgerUseCase(
     private val ledgerRepository: LedgerRepository
 ) {
-    fun execute(): Ledger {
-        return ledgerRepository.loadLedger()
-    }
+    suspend operator fun invoke(forceRefresh: Boolean = false): Ledger =
+        ledgerRepository.getLedger(forceRefresh)
 }
