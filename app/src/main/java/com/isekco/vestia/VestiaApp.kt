@@ -1,4 +1,4 @@
-package com.isekco.vestia.ui
+package com.isekco.vestia
 
 import android.app.Application
 import com.isekco.vestia.di.AppContainer

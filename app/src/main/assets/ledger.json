@@ -21,20 +21,6 @@
 
   "transactions": [
     {
-      "id": "t_0001",
-      "ownerId": "o1",
-      "accountId": "a1",
-      "epochMs": 1735689600000,
-      "transactionType": "BUY",
-      "assetType": "STOCK",
-      "assetInstrument": "THYAO",
-      "unitType": "adet",
-      "quantity": "10",
-      "unitPrice": "245.7500000000",
-      "priceCurrency": "TRY",
-      "tags": "uzun vade"
-    },
-    {
       "id": "t_0002",
       "ownerId": "o1",
       "accountId": "a2",
@@ -47,20 +33,6 @@
       "unitPrice": "1985.1200000000",
       "priceCurrency": "TRY",
       "tags": "fiziki altın"
-    },
-    {
-      "id": "t_0003",
-      "ownerId": "o2",
-      "accountId": "a3",
-      "epochMs": 1736208000000,
-      "transactionType": "BUY",
-      "assetType": "FUND",
-      "assetInstrument": "AFT",
-      "unitType": "pay",
-      "quantity": "120.456",
-      "unitPrice": "32.4500000000",
-      "priceCurrency": "TRY",
-      "tags": "emeklilik fonu"
     },
     {
       "id": "t_0004",
@@ -89,34 +61,6 @@
       "unitPrice": "32.8500000000",
       "priceCurrency": "TRY",
       "tags": "yurtdışı seyahat"
-    },
-    {
-      "id": "t_0006",
-      "ownerId": "o3",
-      "accountId": "a6",
-      "epochMs": 1736985600000,
-      "transactionType": "SELL",
-      "assetType": "STOCK",
-      "assetInstrument": "ASELS",
-      "unitType": "adet",
-      "quantity": "20",
-      "unitPrice": "54.3000000000",
-      "priceCurrency": "TRY",
-      "tags": "kâr realizasyonu"
-    },
-    {
-      "id": "t_0007",
-      "ownerId": "o1",
-      "accountId": "a1",
-      "epochMs": 1737244800000,
-      "transactionType": "GIFT_OUT",
-      "assetType": "TRY",
-      "assetInstrument": "TRY",
-      "unitType": "TRY",
-      "quantity": "5000",
-      "unitPrice": "1.0000000000",
-      "priceCurrency": "TRY",
-      "tags": "aile desteği"
     },
     {
       "id": "t_0008",

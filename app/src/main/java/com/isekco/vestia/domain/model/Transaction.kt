@@ -1,18 +1,5 @@
 package com.isekco.vestia.domain.model
-
 import java.math.BigDecimal
-
-data class Owner(
-    val id: String,
-    val name: String
-)
-
-data class Account(
-    val id: String,
-    val ownerId: String,
-    val name: String,
-    val currency: Currency // hesabın native/settlement para birimi
-)
 
 data class Transaction(
     val id: String,
@@ -43,10 +30,3 @@ data class Transaction(
         get() = "${assetType.name}|$assetInstrument|${unitType.name}"
 }
 
-data class Ledger(
-    val schemaVersion: Int,
-    val baseCurrency: Currency, // raporlama para birimi (root)
-    val owners: List<Owner>,
-    val accounts: List<Account>,
-    val transactions: List<Transaction>
-)

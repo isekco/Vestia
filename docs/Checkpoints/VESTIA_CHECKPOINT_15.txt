@@ -1,0 +1,92 @@
+VESTIA – CHECKPOINT 15
+======================
+
+Konu:
+-----
+PositionEngine (WAC) implementasyonu ve derived domain model üretimi.
+
+Amaç:
+-----
+Ledger verisinden türetilmiş (derived) portföy pozisyonlarının
+hesaplanması ve UI üzerinde gösterilmesi.
+
+Bu checkpoint ile Vestia artık:
+- JSON okuyan uygulama değil,
+- Pozisyon hesaplayan bir domain engine haline gelmiştir.
+
+Yapılanlar:
+-----------
+
+1) Domain Refactor
+   - models.kt parçalandı:
+       - Owner.kt
+       - Account.kt
+       - Transaction.kt
+       - Ledger.kt
+   - Position.kt eklendi (derived domain model)
+
+2) Position Model
+   - PositionKey (ownerId, accountId, assetKey)
+   - Position (quantity, weightedAverageCost, totalCost)
+   - JSON’dan gelmeyen, engine tarafından hesaplanan model
+
+3) PositionEngine
+   - PositionEngine interface tanımlandı
+   - WacPositionEngine implementasyonu yazıldı
+   - Stateless ve deterministik tasarım
+   - FIFO yerine WAC (Weighted Average Cost) tercih edildi
+
+4) WAC Hesaplama Kuralları
+   - BUY: quantity ve totalCost artırılır
+   - SELL: WAC üzerinden maliyet düşülür
+   - quantity 0 olursa totalCost sıfırlanır
+   - Negatif quantity guard eklendi
+   - epochMs ile zaman sıralaması sağlandı
+
+5) UseCase Katmanı
+   - LoadPositionsUseCase eklendi (suspend)
+   - Repository.getLedger() → PositionEngine.calculate()
+   - Derived model üretimi domain seviyesine taşındı
+
+6) AppContainer Güncellemesi
+   - WacPositionEngine eklendi
+   - LoadPositionsUseCase DI zincirine dahil edildi
+   - Repository cache yapısı korunarak engine eklendi
+
+7) UI Katmanı
+   - MainUiState güncellendi (positions, loading, error)
+   - MainViewModel suspend usecase ile entegre edildi
+   - StateFlow ile state yönetimi sağlandı
+   - Basit TextView render ile pozisyonlar gösterildi
+
+8) AssetType Sadeleştirme
+   - Stock ve Fund çıkarıldı
+   - JSON enum uyumu sağlandı
+   - Mapper fail-fast davranışı korundu
+
+Mimari Kazanımlar:
+------------------
+- Domain artık yalnızca veri taşımıyor, hesap yapıyor
+- Engine repository’den bağımsız
+- Derived modeller JSON’dan izole
+- Suspend zinciri doğru propagate edildi
+- UI sadece state gözlemliyor
+
+Vestia artık:
+-------------
+Ledger → PositionEngine → Derived Position → UI
+
+şeklinde tam katmanlı çalışmaktadır.
+
+Sonuç:
+------
+Build OK
+Run OK
+WAC hesaplaması aktif
+Pozisyonlar UI’da görüntüleniyor
+
+Checkpoint 15 burada bilinçli olarak kapatılmıştır.
+
+Tarih:
+------
+2026-02-12
