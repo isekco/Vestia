@@ -1,0 +1,79 @@
+VESTIA – CHECKPOINT 16
+Topic: AddTransaction flow design & ViewModel orchestration decision
+
+Date: 2026-02-18
+
+SUMMARY
+-------
+
+In this checkpoint we clarified the architectural flow for adding new transactions
+and recalculating positions without modifying the existing codebase.
+
+No source code changes were made.
+This checkpoint documents architectural decisions.
+
+KEY DECISIONS
+-------------
+
+1) Repository remains non-reactive.
+   - LedgerRepository will NOT be converted to StateFlow.
+   - Repository continues to provide getLedger() and cache management only.
+   - Avoid unnecessary reactive complexity at repository level.
+
+2) PositionEngine is a pure domain contract.
+   - It is not a use case.
+   - It is a calculation engine (stateless, deterministic).
+   - It can be reused by multiple use cases.
+
+3) AddTransactionUseCase will be introduced.
+   - Responsibility: add new transaction to repository.
+   - It will NOT directly call LoadPositionsUseCase.
+
+4) ViewModel will orchestrate flow.
+   - MainViewModel.init { loadPositions() } remains unchanged.
+   - A new function fun addTransaction(...) will be added.
+   - After successful execution of AddTransactionUseCase,
+     ViewModel will call loadPositions() again.
+   - UI state will automatically update via StateFlow.
+
+5) UI → ViewModel event model confirmed.
+   - Button click in UI will call viewModel.addTransaction(...)
+   - UI does not directly call use cases.
+   - ViewModel owns UI state.
+
+6) DTO Direction Clarification.
+   - UI input should not directly construct domain Transaction.
+   - A separate Input model (e.g., AddTransactionInput or NewTransaction)
+     will be introduced.
+   - UseCase will map input → domain Transaction.
+   - Repository will map domain → storage DTO.
+
+ARCHITECTURAL CLARITY ACHIEVED
+------------------------------
+
+Layer responsibilities reaffirmed:
+
+UI (Activity/Fragment)
+    → Sends user events to ViewModel
+    → Observes StateFlow<MainUiState>
+
+ViewModel
+    → Orchestrates use cases
+    → Owns UI state
+    → Re-triggers loadPositions when necessary
+
+UseCase
+    → Represents business processes
+    → Coordinates repository + engine
+
+Repository
+    → Single source of truth for Ledger
+    → Caching responsibility only
+
+PositionEngine
+    → Pure domain calculation contract
+
+This checkpoint formalizes the event-driven MVVM structure
+before implementing AddTransaction flow.
+
+END OF CHECKPOINT

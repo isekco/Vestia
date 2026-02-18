@@ -49,6 +49,20 @@
       "tags": "kur koruma"
     },
     {
+      "id": "t_0003",
+      "ownerId": "o2",
+      "accountId": "a4",
+      "epochMs": 1736467200000,
+      "transactionType": "BUY",
+      "assetType": "USD",
+      "assetInstrument": "USD",
+      "unitType": "USD",
+      "quantity": "1500",
+      "unitPrice": "30.1250000000",
+      "priceCurrency": "TRY",
+      "tags": "kur koruma"
+    },
+    {
       "id": "t_0005",
       "ownerId": "o3",
       "accountId": "a5",
@@ -64,6 +78,20 @@
     },
     {
       "id": "t_0008",
+      "ownerId": "o2",
+      "accountId": "a3",
+      "epochMs": 1737504000000,
+      "transactionType": "GIFT_IN",
+      "assetType": "TRY",
+      "assetInstrument": "TRY",
+      "unitType": "TRY",
+      "quantity": "5000",
+      "unitPrice": "1.0000000000",
+      "priceCurrency": "TRY",
+      "tags": "ismet'ten"
+    },
+    {
+      "id": "t_0009",
       "ownerId": "o2",
       "accountId": "a3",
       "epochMs": 1737504000000,
