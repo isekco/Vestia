@@ -7,9 +7,9 @@ import com.isekco.vestia.data.datasource.LedgerDataSource
 import com.isekco.vestia.domain.repository.LedgerRepository
 import com.isekco.vestia.domain.usecase.LoadLedgerUseCase
 import com.isekco.vestia.domain.usecase.LoadPositionsUseCase
+import com.isekco.vestia.domain.usecase.AddTransactionUseCase
 import com.isekco.vestia.domain.engine.PositionEngine
 import com.isekco.vestia.domain.engine.WacPositionEngine
-
 
 class AppContainer(appContext: Context) {
 
@@ -29,5 +29,10 @@ class AppContainer(appContext: Context) {
         LoadPositionsUseCase(
             ledgerRepository = ledgerRepository,
             positionEngine = positionEngine
+        )
+
+    val addTransactionUseCase: AddTransactionUseCase =
+        AddTransactionUseCase(
+            ledgerRepository = ledgerRepository
         )
 }

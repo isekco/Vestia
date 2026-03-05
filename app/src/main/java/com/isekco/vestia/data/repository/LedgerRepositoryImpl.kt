@@ -1,11 +1,12 @@
 package com.isekco.vestia.data.repository
 
-import android.content.Context
 import com.google.gson.Gson
 import com.isekco.vestia.data.datasource.LedgerDataSource
 import com.isekco.vestia.data.dto.LedgerDto
 import com.isekco.vestia.data.mapper.toDomain
+import com.isekco.vestia.data.mapper.toDto
 import com.isekco.vestia.domain.model.Ledger
+import com.isekco.vestia.domain.model.Transaction
 import com.isekco.vestia.domain.repository.LedgerRepository
 
 class LedgerRepositoryImpl(
@@ -38,5 +39,26 @@ class LedgerRepositoryImpl(
 
     override fun invalidate() {
         cached = null
+    }
+
+    override suspend fun addTransaction(transaction: Transaction) {
+        synchronized(lock) {
+            val current = cached ?: run {
+                val json = dataSource.readLedgerJson()
+                val dto = gson.fromJson(json, LedgerDto::class.java)
+                dto.toDomain()
+            }
+
+            val updated = current.copy(
+                transactions = (current.transactions + transaction)
+                    .sortedWith(compareBy<Transaction> { it.epochMs }.thenBy { it.id })
+            )
+
+            val dtoOut = updated.toDto()
+            val jsonOut = gson.toJson(dtoOut)
+            dataSource.writeLedgerJson(jsonOut)
+
+            cached = updated
+        }
     }
 }

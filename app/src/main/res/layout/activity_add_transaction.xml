@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Add Transaction"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/edtOwnerId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="OwnerId (e.g., o1)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtAccountId"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="AccountId (e.g., a2)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtTransactionType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Transaction Type (BUY / SELL)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtAssetTypeToken"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Asset (XAU / USD / EUR / TRY / GBP)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtQuantity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Quantity (e.g., 15.25)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/edtUnitPrice"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Unit Price (e.g., 1985.12)"
+            android:inputType="numberDecimal" />
+
+        <EditText
+            android:id="@+id/edtPriceCurrency"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Price Currency (TRY / USD / EUR / GBP)"
+            android:inputType="text" />
+
+        <EditText
+            android:id="@+id/edtEpochMs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="EpochMs (blank = now)"
+            android:inputType="number" />
+
+        <EditText
+            android:id="@+id/edtTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:hint="Tags (optional)"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="Save" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Cancel" />
+
+    </LinearLayout>
+
+</ScrollView>
