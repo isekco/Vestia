@@ -2,7 +2,15 @@ package com.isekco.vestia.ui.transaction
 
 import android.app.DatePickerDialog
 import android.os.Bundle
-import android.widget.*
+import android.text.Editable
+import android.text.TextWatcher
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Lifecycle
@@ -13,14 +21,24 @@ import com.isekco.vestia.VestiaApp
 import com.isekco.vestia.domain.usecase.AddTransactionInput
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 class AddTransactionActivity : AppCompatActivity() {
 
-    private data class OwnerOpt(val id: String, val name: String)
-    private data class AccountOpt(val id: String, val ownerId: String, val name: String, val assetToken: String, val qtyUnit: String)
+    private data class OwnerOpt(
+        val id: String,
+        val name: String
+    )
+
+    private data class AccountOpt(
+        val id: String,
+        val ownerId: String,
+        val name: String,
+        val assetToken: String,
+        val qtyUnit: String
+    )
 
     private lateinit var spOwner: Spinner
     private lateinit var spAccount: Spinner
@@ -53,8 +71,9 @@ class AddTransactionActivity : AppCompatActivity() {
         AccountOpt("AccountGBP_o3", "o3", "AccountGBP_o3", "GBP", "GBP")
     )
 
-    private var selectedDate: LocalDate = LocalDate.now()
-    private val dateFmt = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+    private val selectedCalendar: Calendar = Calendar.getInstance()
+
+    private val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
 
     private val viewModel: AddTransactionViewModel by viewModels {
         val container = (application as VestiaApp).container
@@ -94,14 +113,12 @@ class AddTransactionActivity : AppCompatActivity() {
     }
 
     private fun setupStaticSpinners() {
-        // Owner spinner
         spOwner.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
             owners.map { it.name }
         )
 
-        // Type spinner
         spType.adapter = ArrayAdapter(
             this,
             android.R.layout.simple_spinner_dropdown_item,
@@ -109,83 +126,113 @@ class AddTransactionActivity : AppCompatActivity() {
         )
 
         spOwner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: android.view.View?,
+                position: Int,
+                id: Long
+            ) {
                 val ownerId = owners[position].id
-                val accForOwner = accounts.filter { it.ownerId == ownerId }
+                val accountsForOwner = accounts.filter { it.ownerId == ownerId }
+
                 spAccount.adapter = ArrayAdapter(
                     this@AddTransactionActivity,
                     android.R.layout.simple_spinner_dropdown_item,
-                    accForOwner.map { it.name }
+                    accountsForOwner.map { it.name }
                 )
-                // account değişince asset de değişsin
-                applyAccountDerivedFields(accForOwner.firstOrNull())
+
+                applyAccountDerivedFields(accountsForOwner.firstOrNull())
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
 
         spAccount.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: android.view.View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: android.view.View?,
+                position: Int,
+                id: Long
+            ) {
                 val ownerId = owners[spOwner.selectedItemPosition].id
-                val accForOwner = accounts.filter { it.ownerId == ownerId }
-                applyAccountDerivedFields(accForOwner.getOrNull(position))
+                val accountsForOwner = accounts.filter { it.ownerId == ownerId }
+                applyAccountDerivedFields(accountsForOwner.getOrNull(position))
             }
-            override fun onNothingSelected(parent: AdapterView<*>?) {}
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
         }
     }
 
     private fun applyAccountDerivedFields(account: AccountOpt?) {
         if (account == null) {
-            tvAsset.text = "—"
-            tvQtyUnit.text = "—"
+            tvAsset.text = getString(R.string.placeholder_dash)
+            tvQtyUnit.text = getString(R.string.placeholder_dash)
             return
         }
+
         tvAsset.text = account.assetToken
         tvQtyUnit.text = account.qtyUnit
+        tvPriceCurrency.text = getString(R.string.currency_try)
 
-        // UnitPrice currency hep TRY
-        tvPriceCurrency.text = "TRY"
         updateTotalCost()
     }
 
     private fun setupDate() {
-        tvSelectedDate.text = selectedDate.format(dateFmt)
-        btnPickDate.text = "Pick date"
+        tvSelectedDate.text = dateFormatter.format(selectedCalendar.time)
 
         btnPickDate.setOnClickListener {
-            val d = selectedDate
             DatePickerDialog(
                 this,
-                { _, y, m, day ->
-                    selectedDate = LocalDate.of(y, m + 1, day)
-                    tvSelectedDate.text = selectedDate.format(dateFmt)
+                { _, year, month, dayOfMonth ->
+                    selectedCalendar.set(Calendar.YEAR, year)
+                    selectedCalendar.set(Calendar.MONTH, month)
+                    selectedCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+                    selectedCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                    selectedCalendar.set(Calendar.MINUTE, 0)
+                    selectedCalendar.set(Calendar.SECOND, 0)
+                    selectedCalendar.set(Calendar.MILLISECOND, 0)
+
+                    tvSelectedDate.text = dateFormatter.format(selectedCalendar.time)
                 },
-                d.year, d.monthValue - 1, d.dayOfMonth
+                selectedCalendar.get(Calendar.YEAR),
+                selectedCalendar.get(Calendar.MONTH),
+                selectedCalendar.get(Calendar.DAY_OF_MONTH)
             ).show()
         }
     }
 
     private fun setupWatchers() {
-        val watcher = object : android.text.TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: android.text.Editable?) {
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) = Unit
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) = Unit
+
+            override fun afterTextChanged(s: Editable?) {
                 updateTotalCost()
             }
         }
+
         etQuantity.addTextChangedListener(watcher)
         etUnitPrice.addTextChangedListener(watcher)
     }
 
     private fun updateTotalCost() {
-        val qty = etQuantity.text?.toString()?.trim().orEmpty()
-        val price = etUnitPrice.text?.toString()?.trim().orEmpty()
+        val qtyText = etQuantity.text?.toString()?.trim().orEmpty()
+        val priceText = etUnitPrice.text?.toString()?.trim().orEmpty()
 
         val total = runCatching {
-            if (qty.isBlank() || price.isBlank()) return@runCatching BigDecimal.ZERO
-            BigDecimal(qty).multiply(BigDecimal(price))
+            if (qtyText.isBlank() || priceText.isBlank()) {
+                BigDecimal.ZERO
+            } else {
+                BigDecimal(qtyText).multiply(BigDecimal(priceText))
+            }
         }.getOrDefault(BigDecimal.ZERO)
 
-        tvTotalCost.text = "${total.toPlainString()} TRY"
+        tvTotalCost.text = getString(
+            R.string.total_cost_value,
+            total.toPlainString(),
+            getString(R.string.currency_try)
+        )
     }
 
     private fun bindActions() {
@@ -201,24 +248,18 @@ class AddTransactionActivity : AppCompatActivity() {
         val owner = owners[spOwner.selectedItemPosition]
         val ownerId = owner.id
 
-        val accForOwner = accounts.filter { it.ownerId == ownerId }
-        val account = accForOwner.getOrNull(spAccount.selectedItemPosition)
-            ?: return toastNull("Account selection invalid")
+        val accountsForOwner = accounts.filter { it.ownerId == ownerId }
+        val account = accountsForOwner.getOrNull(spAccount.selectedItemPosition)
+            ?: return toastNull(getString(R.string.error_invalid_account_selection))
 
         val txType = spType.selectedItem?.toString()?.trim().orEmpty()
-
         val qty = etQuantity.text?.toString()?.trim().orEmpty()
         val unitPrice = etUnitPrice.text?.toString()?.trim().orEmpty()
 
-        if (qty.isBlank()) return toastNull("Quantity is required")
-        if (unitPrice.isBlank()) return toastNull("Unit price is required")
+        if (qty.isBlank()) return toastNull(getString(R.string.error_quantity_required))
+        if (unitPrice.isBlank()) return toastNull(getString(R.string.error_unit_price_required))
 
-        // epochMs: seçilen günün start-of-day (local)
-        val epochMs = selectedDate
-            .atStartOfDay(ZoneId.systemDefault())
-            .toInstant()
-            .toEpochMilli()
-
+        val epochMs = selectedCalendar.timeInMillis
         val tags = etTags.text?.toString()?.trim()?.takeIf { it.isNotEmpty() }
 
         return AddTransactionInput(
@@ -245,7 +286,11 @@ class AddTransactionActivity : AppCompatActivity() {
                     }
 
                     if (state.isSuccess) {
-                        Toast.makeText(this@AddTransactionActivity, "Transaction added.", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                            this@AddTransactionActivity,
+                            getString(R.string.transaction_added),
+                            Toast.LENGTH_SHORT
+                        ).show()
                         finish()
                     }
                 }
@@ -253,8 +298,8 @@ class AddTransactionActivity : AppCompatActivity() {
         }
     }
 
-    private fun toastNull(msg: String): AddTransactionInput? {
-        Toast.makeText(this, msg, Toast.LENGTH_LONG).show()
+    private fun toastNull(message: String): AddTransactionInput? {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
         return null
     }
 }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Vestia</string>
+    <string name="placeholder_dash">—</string>
+    <string name="currency_try">TRY</string>
+    <string name="total_cost_value">%1$s %2$s</string>
+    <string name="error_invalid_account_selection">Account selection invalid</string>
+    <string name="error_quantity_required">Quantity is required</string>
+    <string name="error_unit_price_required">Unit price is required</string>
+    <string name="transaction_added">Transaction added.</string>
 </resources>
