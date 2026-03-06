@@ -23,19 +23,11 @@ class AddTransactionViewModel(
         _uiState.update { it.copy(isSaving = true, isSuccess = false, errorMessage = null) }
 
         viewModelScope.launch {
-            runCatching {
-                addTransactionUseCase.execute(input)
-            }.onSuccess {
-                _uiState.update { it.copy(isSaving = false, isSuccess = true, errorMessage = null) }
-            }.onFailure { t ->
-                _uiState.update {
-                    it.copy(
-                        isSaving = false,
-                        isSuccess = false,
-                        errorMessage = t.message ?: "Unknown error"
-                    )
+            runCatching { addTransactionUseCase.execute(input) }
+                .onSuccess { _uiState.update { it.copy(isSaving = false, isSuccess = true) } }
+                .onFailure { t ->
+                    _uiState.update { it.copy(isSaving = false, errorMessage = t.message ?: "Unknown error") }
                 }
-            }
         }
     }
 

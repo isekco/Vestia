@@ -20,14 +20,10 @@ class LedgerRepositoryImpl(
     private val lock = Any()
 
     override suspend fun getLedger(forceRefresh: Boolean): Ledger {
-        if (!forceRefresh) {
-            cached?.let { return it }
-        }
+        if (!forceRefresh) cached?.let { return it }
 
         return synchronized(lock) {
-            if (!forceRefresh) {
-                cached?.let { return@synchronized it }
-            }
+            if (!forceRefresh) cached?.let { return@synchronized it }
 
             val json = dataSource.readLedgerJson()
             val dto = gson.fromJson(json, LedgerDto::class.java)
@@ -35,10 +31,6 @@ class LedgerRepositoryImpl(
             cached = ledger
             ledger
         }
-    }
-
-    override fun invalidate() {
-        cached = null
     }
 
     override suspend fun addTransaction(transaction: Transaction) {
@@ -54,11 +46,14 @@ class LedgerRepositoryImpl(
                     .sortedWith(compareBy<Transaction> { it.epochMs }.thenBy { it.id })
             )
 
-            val dtoOut = updated.toDto()
-            val jsonOut = gson.toJson(dtoOut)
-            dataSource.writeLedgerJson(jsonOut)
+            val outJson = gson.toJson(updated.toDto())
+            dataSource.writeLedgerJson(outJson)
 
             cached = updated
         }
+    }
+
+    override fun invalidate() {
+        cached = null
     }
 }

@@ -1,0 +1,134 @@
+VESTIA – CHECKPOINT 17
+======================
+
+Konu:
+-----
+Add Transaction akışının ilk çalışan sürümünün hazırlanması ve ledger verisinin
+assets yerine local dosyada kalıcı hale getirilmesi.
+
+Amaç:
+-----
+- Uygulamayı yalnızca read-only yapıdan çıkarıp write destekli hale getirmek
+- Yeni transaction eklenebilmesini sağlamak
+- JSON verisini runtime sırasında güncellenebilir bir local dosyada tutmak
+- UI → ViewModel → UseCase → Repository → JSON write zincirini kurmak
+
+Bu Checkpoint'te Alınan Temel Kararlar:
+--------------------------------------
+1) assets/ledger.json artık yalnızca seed kaynağıdır.
+   - Assets dizini write edilemediği için kalıcı kayıt burada tutulmaz.
+   - İlk erişimde assets içeriği local storage içindeki filesDir/ledger.json
+     dosyasına kopyalanır.
+   - Sonraki tüm okuma ve yazma işlemleri local dosya üzerinden yapılır.
+
+2) LedgerRepository artık yalnızca okuma yapan yapı değildir.
+   - getLedger(forceRefresh) korunmuştur.
+   - addTransaction(transaction) eklenmiştir.
+   - invalidate() korunmuştur.
+
+3) Write path için Domain -> DTO mapper kullanılmaktadır.
+   - DTO → Domain dönüşümü zaten mevcuttu.
+   - Kalıcı dosyaya geri yazmak için Domain → DTO dönüşümü kullanılmıştır.
+
+4) AddTransactionUseCase tanımlanmıştır.
+   - UI doğrudan Domain Transaction üretmez.
+   - UI tarafı AddTransactionInput üretir.
+   - UseCase, input modelini domain Transaction nesnesine dönüştürür.
+   - Repository üzerinden kalıcı yazma işlemi yapılır.
+
+5) Add Transaction ekranı temel bir UI ile çalışır hale getirilmiştir.
+   - OwnerId ve AccountId şimdilik manuel girilebilir durumdadır.
+   - TransactionType: BUY / SELL
+   - Quantity ve UnitPrice manuel girişlidir.
+   - EpochMs boş bırakılırsa sistem zamanı kullanılır.
+   - Tags serbest alan olarak bırakılmıştır.
+
+6) Owner ve Account listeleri şu an seed veriden gelmektedir.
+   - Owner1 / Owner2 / Owner3
+   - AccountUSD_o1, AccountXAU_o1, AccountUSD_o2, AccountGBP_o3
+   - İleride hesap ekleme ekranı ile dinamik hale getirilecektir.
+
+Yapılan Teknik Değişiklikler:
+-----------------------------
+1) LedgerDataSource güncellendi
+   - ensureSeeded()
+   - readLedgerJson()
+   - writeLedgerJson()
+
+2) LedgerRepository interface genişletildi
+   - addTransaction(transaction) eklendi
+
+3) LedgerRepositoryImpl write destekleyecek şekilde genişletildi
+   - mevcut ledger okunur
+   - transaction listeye eklenir
+   - sıralanır
+   - JSON serialize edilip local dosyaya yazılır
+   - cache güncellenir
+
+4) Reverse mapper kullanılarak Domain → DTO dönüşümü sağlandı
+
+5) AddTransactionInput ve AddTransactionUseCase eklendi
+   - input doğrulama
+   - Transaction üretimi
+   - repository.addTransaction çağrısı
+
+6) DI zinciri güncellendi
+   - AppContainer içine AddTransactionUseCase eklendi
+
+7) Main ekran güncellendi
+   - "+ Transaction" butonu eklendi
+   - AddTransactionActivity açılır hale getirildi
+   - geri dönüldüğünde positions forceRefresh ile yenilenir
+
+8) AddTransaction ekranı için temel UI katmanı kuruldu
+   - Activity
+   - ViewModel
+   - ViewModelFactory
+   - UiState
+
+Mimari Sonuç:
+-------------
+Vestia artık aşağıdaki akışa sahiptir:
+
+UI Event
+    → AddTransactionActivity
+    → AddTransactionViewModel
+    → AddTransactionUseCase
+    → LedgerRepository
+    → filesDir/ledger.json
+    → MainViewModel refresh
+    → PositionEngine recalculation
+    → UI update
+
+Bu checkpoint ile Vestia:
+- yalnızca JSON okuyan bir uygulama olmaktan çıkmış,
+- local persisted veri üzerinde transaction ekleyebilen bir uygulama haline gelmiştir.
+
+Sınırlar / Bilinçli Olarak Ertelenenler:
+----------------------------------------
+- Edit Transaction yok
+- Delete Transaction yok
+- Transaction listesi henüz UI'a çıkarılmadı
+- Owner / Account listeleri henüz ledger’dan dinamik okunmuyor
+- Hesap ekleme ekranı henüz yok
+- Main UI henüz görsel olarak sade
+
+Bir Sonraki Adım:
+-----------------
+Checkpoint 18:
+- Ana ekranın görsel olarak iyileştirilmesi
+- Pozisyon görünümünün daha okunabilir hale getirilmesi
+- Ardından hesap ekleme akışına geçilmesi
+
+Durum:
+------
+- Add Transaction temel write akışı çalışıyor
+- Local persistence aktif
+- Asset → local seed → filesDir write yaklaşımı netleşti
+- Mimari akış stabil
+
+Checkpoint 17 burada kapatılmıştır.
+
+Tarih:
+------
+2026-03-06

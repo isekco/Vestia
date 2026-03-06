@@ -5,19 +5,14 @@ import java.io.File
 
 class LedgerDataSource(
     private val context: Context,
-    private val assetFileName: String = "ledger.json"
+    private val fileName: String = "ledger.json"
 ) {
-
     private val localFile: File
-        get() = File(context.filesDir, assetFileName)
+        get() = File(context.filesDir, fileName)
 
-    /**
-     * Local dosya yoksa assets içinden seed eder.
-     */
     private fun ensureSeeded() {
         if (localFile.exists()) return
-
-        context.assets.open(assetFileName).use { input ->
+        context.assets.open(fileName).use { input ->
             localFile.outputStream().use { output ->
                 input.copyTo(output)
             }
@@ -29,22 +24,16 @@ class LedgerDataSource(
         return localFile.readText()
     }
 
-    /**
-     * Ledger JSON'u local dosyaya yazar (overwrite).
-     * Basit atomic yaklaşım: temp dosyaya yazıp rename.
-     */
     fun writeLedgerJson(json: String) {
         ensureSeeded()
 
-        val tmp = File(context.filesDir, "$assetFileName.tmp")
+        val tmp = File(context.filesDir, "$fileName.tmp")
         tmp.writeText(json)
 
-        if (localFile.exists()) {
-            localFile.delete()
-        }
+        if (localFile.exists()) localFile.delete()
 
         if (!tmp.renameTo(localFile)) {
-            // renameTo bazı cihazlarda başarısız olabilir; fallback
+            // renameTo bazen fail olabilir → fallback
             localFile.writeText(tmp.readText())
             tmp.delete()
         }

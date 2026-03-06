@@ -16,76 +16,149 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-        <EditText
-            android:id="@+id/edtOwnerId"
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:hint="OwnerId (e.g., o1)"
-            android:inputType="text" />
+            android:text="Owner" />
 
-        <EditText
-            android:id="@+id/edtAccountId"
+        <Spinner
+            android:id="@+id/spOwner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="AccountId (e.g., a2)"
-            android:inputType="text" />
+            android:text="Account" />
 
-        <EditText
-            android:id="@+id/edtTransactionType"
+        <Spinner
+            android:id="@+id/spAccount"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Transaction Type (BUY / SELL)"
-            android:inputType="text" />
+            android:text="Transaction Type" />
 
-        <EditText
-            android:id="@+id/edtAssetTypeToken"
+        <Spinner
+            android:id="@+id/spType"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Asset (XAU / USD / EUR / TRY / GBP)"
-            android:inputType="text" />
+            android:text="Asset (auto from account)" />
 
-        <EditText
-            android:id="@+id/edtQuantity"
+        <TextView
+            android:id="@+id/tvAsset"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="—"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Quantity (e.g., 15.25)"
-            android:inputType="numberDecimal" />
+            android:text="Quantity" />
 
-        <EditText
-            android:id="@+id/edtUnitPrice"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etQuantity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:hint="e.g., 1.25" />
+
+            <TextView
+                android:id="@+id/tvQtyUnit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="—"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Unit Price (e.g., 1985.12)"
-            android:inputType="numberDecimal" />
+            android:text="Unit Price" />
 
-        <EditText
-            android:id="@+id/edtPriceCurrency"
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <EditText
+                android:id="@+id/etUnitPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:inputType="numberDecimal"
+                android:hint="TRY" />
+
+            <TextView
+                android:id="@+id/tvPriceCurrency"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:text="TRY"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Price Currency (TRY / USD / EUR / GBP)"
-            android:inputType="text" />
+            android:text="Total Cost (auto)" />
 
-        <EditText
-            android:id="@+id/edtEpochMs"
+        <TextView
+            android:id="@+id/tvTotalCost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="0 TRY"
+            android:textStyle="bold" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="EpochMs (blank = now)"
-            android:inputType="number" />
+            android:text="Date" />
 
-        <EditText
-            android:id="@+id/edtTags"
+        <Button
+            android:id="@+id/btnPickDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Pick date" />
+
+        <TextView
+            android:id="@+id/tvSelectedDate"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="—" />
+
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Tags (optional)"
+            android:text="Tags (optional)" />
+
+        <EditText
+            android:id="@+id/etTags"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:inputType="text" />
 
         <Button

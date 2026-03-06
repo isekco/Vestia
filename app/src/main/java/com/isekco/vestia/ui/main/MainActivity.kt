@@ -6,18 +6,18 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.Lifecycle
-import com.isekco.vestia.VestiaApp
 import com.isekco.vestia.R
+import com.isekco.vestia.VestiaApp
 import com.isekco.vestia.ui.transaction.AddTransactionActivity
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var btnAddTransaction: Button
     private lateinit var tvContent: TextView
+    private lateinit var btnAddTransaction: Button
 
     private val viewModel: MainViewModel by viewModels {
         val container = (application as VestiaApp).container
@@ -28,8 +28,8 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        btnAddTransaction = findViewById(R.id.btnAddTransaction)
         tvContent = findViewById(R.id.tvContent)
+        btnAddTransaction = findViewById(R.id.btnAddTransaction)
 
         btnAddTransaction.setOnClickListener {
             startActivity(Intent(this, AddTransactionActivity::class.java))
@@ -40,50 +40,35 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        // AddTransaction ekranından geri dönünce pozisyonları yeniden hesapla
+        // AddTransaction'dan dönünce pozisyonları tazele
         viewModel.loadPositions(forceRefresh = true)
     }
 
     private fun observeState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.uiState.collect { state ->
-                    render(state)
-                }
+                viewModel.uiState.collect { state -> render(state) }
             }
         }
     }
 
     private fun render(state: MainUiState) {
-
         when {
-            state.isLoading -> {
-                tvContent.text = "Loading positions..."
-            }
-
-            state.errorMessage != null -> {
-                tvContent.text = "Error:\n${state.errorMessage}"
-            }
-
+            state.isLoading -> tvContent.text = "Loading positions..."
+            state.errorMessage != null -> tvContent.text = "Error:\n${state.errorMessage}"
+            state.positions.isEmpty() -> tvContent.text = "No positions."
             else -> {
-                if (state.positions.isEmpty()) {
-                    tvContent.text = "No positions."
-                    return
+                val b = StringBuilder()
+                state.positions.forEach { p ->
+                    b.appendLine("Owner   : ${p.key.ownerId}")
+                    b.appendLine("Account : ${p.key.accountId}")
+                    b.appendLine("Asset   : ${p.key.assetKey}")
+                    b.appendLine("Qty     : ${p.quantity}")
+                    b.appendLine("WAC     : ${p.weightedAverageCost}")
+                    b.appendLine("Cost    : ${p.totalCost}")
+                    b.appendLine("-------------------------------")
                 }
-
-                val builder = StringBuilder()
-
-                state.positions.forEach { position ->
-                    builder.appendLine("Owner   : ${position.key.ownerId}")
-                    builder.appendLine("Account : ${position.key.accountId}")
-                    builder.appendLine("Asset   : ${position.key.assetKey}")
-                    builder.appendLine("Qty     : ${position.quantity}")
-                    builder.appendLine("WAC     : ${position.weightedAverageCost}")
-                    builder.appendLine("Cost    : ${position.totalCost}")
-                    builder.appendLine("-------------------------------")
-                }
-
-                tvContent.text = builder.toString()
+                tvContent.text = b.toString()
             }
         }
     }

@@ -4,17 +4,6 @@ import com.isekco.vestia.data.dto.*
 import com.isekco.vestia.domain.model.*
 import java.math.RoundingMode
 
-/**
- * Domain -> DTO mappers (write path).
- *
- * JSON sözleşmesini bozmamak için:
- * - TransactionDto.assetType:
- *   - AssetType.XAU => "XAU"
- *   - AssetType.CASH => "USD/EUR/TRY/GBP" gibi instrument üzerinden yazılır
- * - TransactionDto.unitType:
- *   - UnitType.GRAM => "g"
- *   - diğerleri => enum name ("USD", "TRY" ...)
- */
 internal fun Ledger.toDto(): LedgerDto {
     return LedgerDto(
         schemaVersion = schemaVersion,
@@ -25,10 +14,7 @@ internal fun Ledger.toDto(): LedgerDto {
     )
 }
 
-private fun Owner.toDto(): OwnerDto = OwnerDto(
-    id = id,
-    name = name
-)
+private fun Owner.toDto(): OwnerDto = OwnerDto(id = id, name = name)
 
 private fun Account.toDto(): AccountDto = AccountDto(
     id = id,
@@ -40,7 +26,7 @@ private fun Account.toDto(): AccountDto = AccountDto(
 private fun Transaction.toDto(): TransactionDto {
     val jsonAssetType = when (assetType) {
         AssetType.XAU -> "XAU"
-        AssetType.CASH -> assetInstrument // USD/EUR/TRY/GBP
+        AssetType.CASH -> assetInstrument // USD/EUR/GBP/TRY
         AssetType.FX -> "FX"
     }
 
@@ -49,14 +35,15 @@ private fun Transaction.toDto(): TransactionDto {
         else -> unitType.name
     }
 
-    // JSON tarafında quantity/unitPrice string tutuluyor.
-    // Yazarken stabil olsun diye 10 scale kullanıyoruz.
-    val qty = quantity.setScale(10, RoundingMode.HALF_UP)
+    val qty = quantity
+        .setScale(10, RoundingMode.HALF_UP)
         .toPlainString()
         .trimEnd('0')
         .trimEnd('.')
 
-    val price = unitPrice.setScale(10, RoundingMode.HALF_UP).toPlainString()
+    val price = unitPrice
+        .setScale(10, RoundingMode.HALF_UP)
+        .toPlainString()
 
     return TransactionDto(
         id = id,
