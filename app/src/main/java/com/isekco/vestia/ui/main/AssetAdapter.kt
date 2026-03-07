@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.isekco.vestia.R
@@ -41,41 +40,18 @@ class AssetAdapter(
         private val assetQuantityText: TextView = itemView.findViewById(R.id.assetQuantityText)
         private val assetRateText: TextView = itemView.findViewById(R.id.assetRateText)
         private val assetValueTlText: TextView = itemView.findViewById(R.id.assetValueTlText)
-        private val selectedIndicator: View = itemView.findViewById(R.id.selectedIndicator)
 
         fun bind(item: AssetUiModel) {
-            assetNameText.text = item.assetKey
+            assetNameText.text = item.assetLabel
             assetQuantityText.text = formatQuantity(item.quantity)
-            assetRateText.text = "TRY/${item.assetKey} : ${formatRate(item.tryRate)}"
+            assetRateText.text = "TRY/${item.assetLabel} : ${formatRate(item.tryRate)}"
             assetValueTlText.text = formatTry(item.totalValueTry)
 
-            val colorRes = assetColorRes(item.assetKey)
-            val resolvedColor = ContextCompat.getColor(itemView.context, colorRes)
+            assetColorIndicator.setBackgroundResource(dotDrawableRes(item.assetLabel))
 
-            assetColorIndicator.setBackgroundResource(dotDrawableRes(item.assetKey))
-            selectedIndicator.setBackgroundColor(resolvedColor)
-
-            if (item.isSelected) {
-                selectedIndicator.visibility = View.VISIBLE
-                assetCard.strokeWidth = dpToPx(itemView, 2)
-                assetCard.strokeColor = resolvedColor
-                assetCard.cardElevation = dpToPx(itemView, 4).toFloat()
-            } else {
-                selectedIndicator.visibility = View.GONE
-                assetCard.strokeWidth = dpToPx(itemView, 1)
-                assetCard.strokeColor = ContextCompat.getColor(itemView.context, R.color.vestia_border)
-                assetCard.cardElevation = dpToPx(itemView, 2).toFloat()
-            }
-        }
-
-        private fun assetColorRes(assetKey: String): Int {
-            return when (assetKey.uppercase(Locale.US)) {
-                "USD" -> R.color.asset_usd
-                "XAU" -> R.color.asset_xau
-                "GBP" -> R.color.asset_gbp
-                "EUR" -> R.color.asset_eur
-                else -> R.color.vestia_border
-            }
+            assetCard.strokeWidth = dpToPx(itemView, 1)
+            assetCard.strokeColor = itemView.context.getColor(R.color.vestia_border)
+            assetCard.cardElevation = dpToPx(itemView, 2).toFloat()
         }
 
         private fun dotDrawableRes(assetKey: String): Int {

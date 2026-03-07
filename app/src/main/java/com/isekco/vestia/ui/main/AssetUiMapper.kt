@@ -3,6 +3,7 @@ package com.isekco.vestia.ui.main
 import com.isekco.vestia.domain.model.Position
 import java.math.BigDecimal
 import java.math.RoundingMode
+import java.util.Locale
 
 object AssetUiMapper {
 
@@ -14,31 +15,30 @@ object AssetUiMapper {
     )
 
     fun toAssetUiModels(
-        positions: List<Position>,
-        selectedAssetKey: String? = null
+        positions: List<Position>
     ): List<AssetUiModel> {
         return positions
-            .groupBy { position -> position.key.assetKey }
-            .map { (assetKey, assetPositions) ->
+            .groupBy { position -> normalizedAssetLabel(position.key.assetKey) }
+            .map { (assetLabel, assetPositions) ->
                 val totalQuantity = assetPositions
                     .map { it.quantity }
                     .fold(BigDecimal.ZERO, BigDecimal::add)
 
-                val tryRate = rateMap[assetKey] ?: BigDecimal.ONE
+                val tryRate = rateMap[assetLabel] ?: BigDecimal.ONE
 
                 val totalValueTry = totalQuantity
                     .multiply(tryRate)
                     .setScale(2, RoundingMode.HALF_UP)
 
                 AssetUiModel(
-                    assetKey = assetKey,
+                    assetKey = assetLabel,
+                    assetLabel = assetLabel,
                     quantity = totalQuantity,
                     tryRate = tryRate,
-                    totalValueTry = totalValueTry,
-                    isSelected = assetKey == selectedAssetKey
+                    totalValueTry = totalValueTry
                 )
             }
-            .sortedBy { it.assetKey }
+            .sortedByDescending { it.totalValueTry }
     }
 
     fun calculatePortfolioTotalTry(items: List<AssetUiModel>): BigDecimal {
@@ -46,5 +46,17 @@ object AssetUiMapper {
             .map { it.totalValueTry }
             .fold(BigDecimal.ZERO, BigDecimal::add)
             .setScale(2, RoundingMode.HALF_UP)
+    }
+
+    private fun normalizedAssetLabel(rawAssetKey: String): String {
+        val normalized = rawAssetKey.uppercase(Locale.US)
+
+        return when {
+            normalized.contains("USD") -> "USD"
+            normalized.contains("XAU") || normalized.contains("GRAM") -> "XAU"
+            normalized.contains("GBP") -> "GBP"
+            normalized.contains("EUR") -> "EUR"
+            else -> rawAssetKey
+        }
     }
 }

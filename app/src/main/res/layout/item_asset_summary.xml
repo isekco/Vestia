@@ -46,7 +46,7 @@
                 android:layout_height="wrap_content"
                 android:text="10.00"
                 android:textColor="@color/vestia_text_secondary"
-                android:textSize="16sp"
+                android:textSize="15sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -63,7 +63,7 @@
                 android:layout_weight="1"
                 android:text="TRY/USD : 39.2500"
                 android:textColor="@color/vestia_text_secondary"
-                android:textSize="14sp" />
+                android:textSize="15sp" />
 
             <TextView
                 android:id="@+id/assetValueTlText"
@@ -71,17 +71,9 @@
                 android:layout_height="wrap_content"
                 android:text="₺392.500,00"
                 android:textColor="@color/vestia_text_primary"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
         </LinearLayout>
-
-        <View
-            android:id="@+id/selectedIndicator"
-            android:layout_width="match_parent"
-            android:layout_height="4dp"
-            android:layout_marginTop="14dp"
-            android:background="@color/asset_usd"
-            android:visibility="gone" />
 
     </LinearLayout>
 

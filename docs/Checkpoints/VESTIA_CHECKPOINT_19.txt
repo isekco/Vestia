@@ -1,0 +1,89 @@
+
+VESTIA – CHECKPOINT 19
+======================
+
+Konu
+----
+Main dashboard görsel iyileştirmeleri (UI polish) ve kullanıcı etkileşimlerinin
+iyileştirilmesi.
+
+Amaç
+----
+- Dashboard ekranını daha okunabilir ve dengeli hale getirmek
+- PieChart ve legend etkileşimini netleştirmek
+- Büyük portföy değerlerinde sayı gösterimini stabil hale getirmek
+- Asset kartlarının görsel uyumunu artırmak
+
+Yapılan İyileştirmeler
+----------------------
+
+1) PieChart Görsel Düzenleme
+   - Chart boyutu yaklaşık %20 küçültüldü
+   - Üst ve alt boşluklar azaltıldı
+   - Center text kaldırıldı (toplam değer sağ tarafta gösteriliyor)
+   - Chart yalnızca ilk render sırasında animateY ile animasyon alıyor
+
+2) PieChart – Legend Senkronizasyonu
+   - PieChart dilimine dokununca ilgili legend underline oluyor
+   - Legend’a dokununca ilgili pie slice highlight ediliyor
+   - İki yönlü seçim senkronizasyonu sağlandı
+
+3) Portfolio Summary Alanı
+   - Toplam portföy değeri tek satırda kalacak şekilde düzenlendi
+   - TextView autosize kullanılarak adaptif font boyutu sağlandı
+   - Büyük değerlerde metin kesilmesi problemi giderildi
+
+4) Para Formatlama
+   - TRY formatı standartlaştırıldı
+   - DecimalFormat ile aşağıdaki format sabitlendi:
+
+     ₺#,##0.00
+
+   - Virgülden sonraki iki basamak her zaman görünür
+
+5) Layout İyileştirmeleri
+   - PieChart sola hizalandı
+   - Portfolio summary metni chart’ın sağında konumlandırıldı
+   - Legend elemanları yatayda eşit boşluklu hale getirildi
+
+6) Asset Kartları
+   - Asset label sadeleştirildi (CASH|USD|USD → USD)
+   - Kart içindeki renk göstergeleri chart ile uyumlu hale getirildi
+   - Kart highlight davranışı kaldırıldı (seçim legend üzerinden gösteriliyor)
+
+Genel Sonuç
+-----------
+
+Vestia dashboard artık:
+
+MainUiState
+    → MainActivity
+    → AssetUiMapper
+    → PieChart + Legend
+    → RecyclerView Asset Cards
+
+şeklinde çalışan daha stabil ve görsel olarak dengeli bir yapıya ulaşmıştır.
+
+Bu checkpoint ile Vestia:
+
+- Dashboard görsel olarak rafine edilmiş
+- PieChart ve legend etkileşimi iyileştirilmiş
+- Büyük portföy değerleri doğru şekilde gösterilebilir hale getirilmiş
+- UI tarafında önemli bir stabilite kazanmıştır.
+
+Sonraki Adım (Checkpoint 20)
+----------------------------
+- Asset yüzdelik dağılımlarının gösterimi
+- PieChart tooltip iyileştirmeleri
+- Hesap (Account) yönetimi ekranı
+- Transaction listesi görünümü
+
+Durum
+-----
+Build OK
+Dashboard stabil
+UI polish tamamlandı
+
+Tarih
+-----
+2026-03

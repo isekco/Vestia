@@ -9,10 +9,13 @@
   "accounts": [
     { "id": "AccountUSD_o1", "ownerId": "o1", "name": "AccountUSD_o1", "currency": "TRY" },
     { "id": "AccountXAU_o1", "ownerId": "o1", "name": "AccountXAU_o1", "currency": "TRY" },
+    { "id": "AccountEUR_o1", "ownerId": "o1", "name": "AccountEUR_o1", "currency": "TRY" },
 
     { "id": "AccountUSD_o2", "ownerId": "o2", "name": "AccountUSD_o2", "currency": "TRY" },
+    { "id": "AccountEUR_o2", "ownerId": "o2", "name": "AccountEUR_o2", "currency": "TRY" },
 
-    { "id": "AccountGBP_o3", "ownerId": "o3", "name": "AccountGBP_o3", "currency": "TRY" }
+    { "id": "AccountGBP_o3", "ownerId": "o3", "name": "AccountGBP_o3", "currency": "TRY" },
+    { "id": "AccountEUR_o3", "ownerId": "o3", "name": "AccountEUR_o3", "currency": "TRY" }
   ],
   "transactions": []
 }

@@ -4,8 +4,8 @@ import java.math.BigDecimal
 
 data class AssetUiModel(
     val assetKey: String,
+    val assetLabel: String,
     val quantity: BigDecimal,
     val tryRate: BigDecimal,
-    val totalValueTry: BigDecimal,
-    val isSelected: Boolean = false
+    val totalValueTry: BigDecimal
 )
