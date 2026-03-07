@@ -2,4 +2,23 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Base UI -->
+    <color name="vestia_background">#ECECEC</color>
+    <color name="vestia_primary">#35455F</color>
+    <color name="vestia_primary_dark">#223452</color>
+    <color name="vestia_border">#223A68</color>
+    <color name="vestia_text_primary">#111111</color>
+    <color name="vestia_text_secondary">#2F3A4A</color>
+    <color name="vestia_white">#FFFFFF</color>
+    <color name="vestia_black">#000000</color>
+
+    <!-- Asset colors -->
+    <color name="asset_usd">#4D79D8</color>
+    <color name="asset_xau">#CC640F</color>
+    <color name="asset_gbp">#5B9134</color>
+    <color name="asset_eur">#F0CD5D</color>
+
+    <!-- State / helper -->
+    <color name="legend_unselected">#B8B8B8</color>
+    <color name="card_fill">#F7F7F7</color>
 </resources>

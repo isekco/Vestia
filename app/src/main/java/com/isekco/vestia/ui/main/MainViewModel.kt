@@ -5,36 +5,52 @@ import androidx.lifecycle.viewModelScope
 import com.isekco.vestia.domain.usecase.LoadPositionsUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class MainViewModel(
     private val loadPositionsUseCase: LoadPositionsUseCase
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState(isLoading = true))
-    val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
+    private var hasLoadedInitially: Boolean = false
+
+    private val _uiState = MutableStateFlow(
+        MainUiState(
+            positions = emptyList(),
+            isLoading = false,
+            errorMessage = null
+        )
+    )
+    val uiState: StateFlow<MainUiState> = _uiState
 
     init {
         loadPositions()
     }
 
     fun loadPositions(forceRefresh: Boolean = false) {
+        if (hasLoadedInitially && !forceRefresh) {
+            return
+        }
+
         viewModelScope.launch {
-            _uiState.value = MainUiState(isLoading = true)
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMessage = null
+            )
 
             try {
                 val positions = loadPositionsUseCase.execute(forceRefresh)
+
+                hasLoadedInitially = true
                 _uiState.value = MainUiState(
-                    isLoading = false,
                     positions = positions,
+                    isLoading = false,
                     errorMessage = null
                 )
-            } catch (e: Exception) {
+            } catch (t: Throwable) {
                 _uiState.value = MainUiState(
-                    isLoading = false,
                     positions = emptyList(),
-                    errorMessage = e.message ?: "Unknown error"
+                    isLoading = false,
+                    errorMessage = t.message ?: "Unknown error"
                 )
             }
         }

@@ -1,0 +1,157 @@
+VESTIA – CHECKPOINT 18
+======================
+
+Konu:
+-----
+Ana ekranın görsel dashboard yapısına taşınması,
+pie chart entegrasyonu, asset summary kartlarının eklenmesi
+ve main ekranın gerçek uygulama görünümüne yaklaştırılması.
+
+Amaç:
+-----
+- Main ekranı düz metin/debug görünümünden çıkarmak
+- Portföy özetini tek bakışta okunabilir hale getirmek
+- Asset dağılımını görsel olarak pie chart ile göstermek
+- Asset bazlı kartlarla quantity / kur / TL karşılığını sunmak
+- Add Transaction akışını yeni dashboard ile uyumlu biçimde korumak
+
+Bu Checkpoint'te Alınan Temel Kararlar:
+--------------------------------------
+1) Main ekran artık dashboard odaklı çalışacaktır.
+   - Üst banner
+   - Portfolio summary card
+   - Pie chart
+   - Legend
+   - Asset summary list
+   - Floating action button
+   yapısı benimsendi.
+
+2) Canlı kur entegrasyonu henüz yapılmadı.
+   - Web üzerinden kur çekme işi sonraya bırakıldı.
+   - Geliştirme ve görsel doğrulama için hardcoded TRY rates kullanıldı.
+
+3) Domain model korunmuştur.
+   - UI, domain Position nesnesini doğrudan kartlara basmaz.
+   - Position -> AssetUiModel dönüşümü ile UI-ready model üretildi.
+
+4) Pie chart ile liste senkron çalışacaktır.
+   - Dilime tıklanınca ilgili asset seçilir.
+   - Legend underline edilir.
+   - İlgili asset kartı highlight edilir.
+
+5) Repository / UseCase / ViewModel akışı korunmuştur.
+   - Görsel iyileştirme yapılırken mevcut mimari bozulmadı.
+   - forceRefresh ile Add Transaction dönüşünde main ekran yenilenmeye devam eder.
+
+Yapılan Teknik Değişiklikler:
+-----------------------------
+1) Build / dependency altyapısı güncellendi
+   - MPAndroidChart eklendi
+   - JitPack repository tanımlandı
+
+2) Theme / color / strings altyapısı genişletildi
+   - Dashboard renk paleti tanımlandı
+   - Main ekran string'leri eklendi
+   - NoActionBar tema yapısı ile özel top banner desteklendi
+
+3) Main ekran layout'u baştan düzenlendi
+   - activity_main.xml dashboard yapısına çevrildi
+   - Top banner, summary card, pie chart, legend ve recycler alanı eklendi
+   - Add Transaction için FloatingActionButton kullanıldı
+
+4) Asset kart layout'u oluşturuldu
+   - item_asset_summary.xml eklendi
+   - Asset adı, quantity, kur bilgisi ve TL karşılığı aynı kartta gösterildi
+   - Alt satırda seçili state için indicator alanı tanımlandı
+
+5) Legend sistemi oluşturuldu
+   - USD / XAU / GBP / EUR için drawable dot dosyaları eklendi
+   - Chart rengi ile legend ve kart göstergeleri eşlendi
+
+6) UI mapping katmanı oluşturuldu
+   - AssetUiModel eklendi
+   - AssetUiMapper ile Position -> AssetUiModel dönüşümü yazıldı
+   - Hardcoded rate map ile TL karşılıkları hesaplandı
+   - Portfolio total TRY hesabı merkezi hale getirildi
+
+7) RecyclerView adapter yazıldı
+   - AssetAdapter ile kartlar veriyle dolduruldu
+   - Quantity, rate ve TRY formatlamaları eklendi
+   - Seçili asset için stroke / elevation / bottom indicator vurgusu eklendi
+
+8) MainActivity dashboard akışına geçirildi
+   - RecyclerView bağlandı
+   - PieChart setup yapıldı
+   - Legend selection yönetimi eklendi
+   - Portfolio total text güncellendi
+   - FAB ile AddTransactionActivity açılmaya devam etti
+
+9) MainUiState / MainViewModel uyumlandırıldı
+   - positions / isLoading / errorMessage alanları netleştirildi
+   - ViewModel içinde forceRefresh destekli load akışı korundu
+   - UseCase çağrısı mevcut execute(forceRefresh) yapısına uyarlandı
+
+10) LoadPositionsUseCase ana ekran refresh mantığıyla uyumlu tutuldu
+    - execute(forceRefresh) ile repository cache bypass desteği korundu
+
+11) Pie chart crash fix uygulandı
+    - Programatik highlightValue çağrısı kaldırıldı
+    - onValueSelected -> render -> highlight -> onValueSelected recursion döngüsü kesildi
+    - Chart seçimi kullanıcı etkileşimi ile doğal hale bırakıldı
+
+Mimari Sonuç:
+-------------
+Vestia ana ekranı artık şu akışla çalışmaktadır:
+
+MainUiState
+    -> MainActivity
+    -> AssetUiMapper
+    -> PieChart + RecyclerView dashboard
+
+ve Add Transaction dönüşünde:
+
+AddTransactionActivity
+    -> MainActivity.onResume()
+    -> MainViewModel.loadPositions(forceRefresh = true)
+    -> UseCase.execute(forceRefresh)
+    -> Dashboard refresh
+
+Bu checkpoint ile Vestia:
+- düz text/debug ekranından çıkmış,
+- görsel dashboard yapısına geçmiş,
+- pie chart destekli,
+- asset kartları olan,
+- interaktif seçim davranışı bulunan
+bir uygulama haline gelmiştir.
+
+Sınırlar / Bilinçli Olarak Ertelenenler:
+----------------------------------------
+- Canlı kur servisi henüz yok
+- Pie chart animasyon polish henüz temel seviyede
+- Asset sıralama / yüzde gösterimi henüz eklenmedi
+- Loading / error için özel görsel placeholder henüz eklenmedi
+- Top banner ikonları şimdilik yalnızca görsel amaçlıdır
+
+Bir Sonraki Adım:
+-----------------
+Checkpoint 19:
+- Görsel düzenlemeler / UI polish
+- Spacing, hizalama, boyut ve oran iyileştirmeleri
+- Pie chart görsel ince ayarları
+- Kart görünümünün daha rafine hale getirilmesi
+- Gerekirse yüzde / animasyon / sıralama gibi dashboard polish işleri
+
+Durum:
+------
+- Build OK
+- Main dashboard çalışıyor
+- Pie chart gösteriliyor
+- Asset kartları gösteriliyor
+- Add Transaction sonrası refresh çalışıyor
+- Pie chart touch crash fix uygulanmış durumda
+
+Checkpoint 18 burada kapatılmıştır.
+
+Tarih:
+------
+2026-03-07

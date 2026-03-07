@@ -1,5 +1,22 @@
 <resources>
+
+    <!-- App -->
     <string name="app_name">Vestia</string>
+
+    <!-- Main Screen -->
+    <string name="main_page_title">Ana Sayfa</string>
+    <string name="portfolio_summary">Portfolio Summary</string>
+    <string name="sample_total_value">₺0,00</string>
+
+    <!-- Buttons -->
+    <string name="add_transaction">Add Transaction</string>
+
+    <!-- Icons -->
+    <string name="profile_icon">Profile</string>
+    <string name="expand_icon">Expand</string>
+    <string name="settings_icon">Settings</string>
+
+    <!-- AddTransaction Screen -->
     <string name="placeholder_dash">—</string>
     <string name="currency_try">TRY</string>
     <string name="total_cost_value">%1$s %2$s</string>
@@ -7,4 +24,5 @@
     <string name="error_quantity_required">Quantity is required</string>
     <string name="error_unit_price_required">Unit price is required</string>
     <string name="transaction_added">Transaction added.</string>
+
 </resources>

@@ -9,11 +9,6 @@ class LoadPositionsUseCase(
     private val positionEngine: PositionEngine
 ) {
 
-    /**
-     * Portföy pozisyonlarını (derived) üretir.
-     *
-     * forceRefresh=true verilirse repository cache bypass eder.
-     */
     suspend fun execute(forceRefresh: Boolean = false): List<Position> {
         val ledger = ledgerRepository.getLedger(forceRefresh = forceRefresh)
         return positionEngine.calculate(ledger)
