@@ -42,9 +42,20 @@ class AssetAdapter(
         private val assetValueTlText: TextView = itemView.findViewById(R.id.assetValueTlText)
 
         fun bind(item: AssetUiModel) {
+
+            val unit = when (item.assetLabel) {
+                "XAU" -> "g"
+                "USD" -> "$"
+                "EUR" -> "€"
+                "GBP" -> "£"
+                else -> ""
+            }
+
             assetNameText.text = item.assetLabel
-            assetQuantityText.text = formatQuantity(item.quantity)
-            assetRateText.text = "TRY/${item.assetLabel} : ${formatRate(item.tryRate)}"
+            assetQuantityText.text = formatQuantity(item.quantity, unit = unit)
+
+            assetRateText.text = "₺ ${item.tryRate} / ${unit}"
+
             assetValueTlText.text = formatTry(item.totalValueTry)
 
             assetColorIndicator.setBackgroundResource(dotDrawableRes(item.assetLabel))
@@ -64,9 +75,11 @@ class AssetAdapter(
             }
         }
 
-        private fun formatQuantity(value: BigDecimal): String {
+        private fun formatQuantity(value: BigDecimal, unit: String): String {
             val df = DecimalFormat("#,##0.##", DecimalFormatSymbols(Locale.US))
-            return df.format(value)
+
+            //return df.format(value) + " " + unit
+            return "${df.format(value)} $unit"
         }
 
         private fun formatRate(value: BigDecimal): String {

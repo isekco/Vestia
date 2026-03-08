@@ -1,0 +1,80 @@
+
+VESTIA CHECKPOINT 20
+====================
+
+Scope
+-----
+This checkpoint focuses on UI stabilization and layout cleanup before starting the
+next feature: live exchange rate fetching.
+
+Main Changes
+------------
+
+1. Dashboard Simplification
+   - PieChart and related dependencies were removed from the project.
+   - Top banner now only shows "Portfolio Summary".
+   - UI simplified to reduce visual noise and prepare for future financial metrics.
+
+2. Layout Standardization
+   - Asset summary card layout redesigned for clearer financial hierarchy.
+   - Final layout structure:
+
+        Asset Name
+        Quantity + Rate              Total Value
+
+   Example:
+
+        Gold
+        125 g       ₺2,345 / g       ₺293,125
+
+3. LinearLayout Weight Alignment
+   - Used layout_weight for proper horizontal alignment.
+   - Middle column expands using:
+        layout_width = 0dp
+        layout_weight = 1
+
+   This ensures the total value always aligns to the right edge.
+
+4. Text Auto‑Sizing Improvements
+   - Introduced centralized text sizing via dimens.xml.
+   - Added min/max autosize boundaries.
+   - Corrected invalid dimension values (missing 'sp').
+
+5. Quantity Unit Formatting
+   - Quantity values now formatted in code with unit suffix.
+   - Example:
+
+        125 g
+
+   Unit logic based on asset label:
+        XAU -> g
+        USD -> $
+        EUR -> €
+        GBP -> £
+
+6. Layout Stability Fixes
+   - Removed incorrect match_parent usage that broke alignment.
+   - Fixed autosize crashes caused by invalid dimension values.
+
+Project State
+-------------
+
+Current UI status:
+
+• Dashboard banner working
+• Asset list rendering correctly
+• Autosize text functioning
+• Asset values aligned correctly
+• Layout stable for RecyclerView items
+
+Next Step (Checkpoint 21)
+-------------------------
+
+Implement live FX rate retrieval.
+
+Planned work:
+- Exchange rate API integration
+- Currency conversion layer
+- Repository update for rate fetching
+- ViewModel update for refresh logic
+- Automatic portfolio revaluation

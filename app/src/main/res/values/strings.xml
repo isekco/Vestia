@@ -16,6 +16,10 @@
     <string name="expand_icon">Expand</string>
     <string name="settings_icon">Settings</string>
 
+    <!-- item asset summary -->
+    <string name="asset_name">USD</string>
+    <string name="asset_qty">10.000,00000</string>
+
     <!-- AddTransaction Screen -->
     <string name="placeholder_dash">—</string>
     <string name="currency_try">TRY</string>

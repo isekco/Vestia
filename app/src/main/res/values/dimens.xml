@@ -1,0 +1,20 @@
+<resources>
+
+    <!-- Text Sizes -->
+    <dimen name="text_portfolio_summary_title">20sp</dimen>
+    <dimen name="text_portfolio_summary_title_max">32sp</dimen>
+    <dimen name="text_portfolio_summary_title_min">16sp</dimen>
+
+    <dimen name="text_total_portfolio_value">28sp</dimen>
+    <dimen name="text_total_portfolio_value_max">40sp</dimen>
+    <dimen name="text_total_portfolio_value_min">20sp</dimen>
+
+    <dimen name="text_asset_title">20sp</dimen>
+    <dimen name="text_asset_title_max">28sp</dimen>
+    <dimen name="text_asset_title_min">16sp</dimen>
+
+    <dimen name="text_asset_info">14sp</dimen>
+    <dimen name="text_asset_info_max">22sp</dimen>
+    <dimen name="text_asset_info_min">10sp</dimen>
+
+</resources>
