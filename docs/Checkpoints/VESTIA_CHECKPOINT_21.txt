@@ -1,0 +1,78 @@
+VESTIA CHECKPOINT 21
+Date: 2026-03-08
+
+SUMMARY
+-------
+This checkpoint introduces the first implementation of the external FX rate system
+for Vestia. The goal is to allow the application to fetch live exchange rates
+(USD, EUR, GBP) from a free internet API and use them to calculate portfolio
+values in TRY.
+
+At the same time, the architecture ensures that the application continues to
+work even when the internet is unavailable.
+
+MAIN ARCHITECTURE CHANGES
+-------------------------
+1. New Rate Layer
+   - Added RateDataSource responsible for:
+     * Fetching rates from Frankfurter API
+     * Reading cached rates from filesDir/rates.json
+     * Reading seed fallback from assets/rates.json
+     * Writing updated cache
+
+2. Rate Repository
+   - RateRepositoryImpl introduced
+   - Handles:
+     * Memory cache
+     * Fallback logic (cache -> assets)
+     * Merge of remote rates with existing assets (XAU etc.)
+
+3. Domain Integration
+   - LoadRatesUseCase added
+   - MainViewModel updated to load:
+       * Positions (mandatory)
+       * Rates (optional)
+
+4. UI Changes
+   - AssetUiMapper updated to support missing rates.
+   - When rates are unavailable:
+       rateText = "---"
+       totalValueText = "---"
+
+5. UX Improvement
+   - Portfolio and assets remain visible even if rate fetching fails.
+   - Quantity always visible.
+   - Portfolio summary shows "---" when calculation is unavailable.
+
+6. Layout Restoration
+   - item_asset_summary.xml restored to original card design:
+       * MaterialCardView
+       * colored indicator dot
+       * original typography and layout
+   - AssetAdapter updated to match restored layout IDs.
+
+CURRENT STATUS
+--------------
+Application builds and runs successfully.
+
+Assets and quantities are displayed correctly.
+
+Rates are currently not being fetched successfully and therefore:
+    Portfolio Summary = ---
+    Rate = ---
+    Total Value = ---
+
+This behavior is intentional fallback logic and confirms that the
+UI degradation strategy works as designed.
+
+NEXT CHECKPOINT
+---------------
+Checkpoint 22 will focus on debugging the FX rate pipeline:
+
+    * API connectivity
+    * RateDataSource network calls
+    * JSON parsing
+    * repository merge logic
+    * cache writing/reading
+
+Once fixed, portfolio TRY values will be calculated correctly.

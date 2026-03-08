@@ -4,7 +4,8 @@ enum class Currency {
     TRY,
     USD,
     EUR,
-    GBP
+    GBP,
+    XAU
 }
 enum class TransactionDirection {
     IN,

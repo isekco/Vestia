@@ -29,4 +29,6 @@
     <string name="error_unit_price_required">Unit price is required</string>
     <string name="transaction_added">Transaction added.</string>
 
+    <string name="portfolio_value_unavailable">---</string>
+
 </resources>

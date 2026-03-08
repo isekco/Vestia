@@ -14,6 +14,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.isekco.vestia.R
 import com.isekco.vestia.VestiaApp
 import com.isekco.vestia.domain.model.Position
+import com.isekco.vestia.domain.model.Rates
 import com.isekco.vestia.ui.transaction.AddTransactionActivity
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
@@ -30,9 +31,11 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var assetAdapter: AssetAdapter
 
+    private val assetUiMapper = AssetUiMapper()
+
     private val viewModel: MainViewModel by viewModels {
         val container = (application as VestiaApp).container
-        MainViewModelFactory(container.loadPositionsUseCase)
+        MainViewModelFactory(container)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onResume() {
         super.onResume()
-        viewModel.loadPositions(forceRefresh = true)
+        viewModel.loadDashboard(forceRefresh = true)
     }
 
     private fun bindViews() {
@@ -79,24 +82,38 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun render(state: MainUiState) {
-        when {
-            state.isLoading || state.errorMessage != null -> {
-                totalPortfolioValueText.text = getString(R.string.sample_total_value)
-                assetAdapter.submitList(emptyList())
-            }
-
-            else -> {
-                renderDashboard(state.positions)
-            }
+        if (state.isLoading && state.positions.isEmpty()) {
+            totalPortfolioValueText.text = getString(R.string.portfolio_value_unavailable)
+            assetAdapter.submitList(emptyList())
+            return
         }
+
+        renderDashboard(
+            positions = state.positions,
+            rates = state.rates
+        )
     }
 
-    private fun renderDashboard(positions: List<Position>) {
-        val assetItems = AssetUiMapper.toAssetUiModels(positions)
+    private fun renderDashboard(
+        positions: List<Position>,
+        rates: Rates?
+    ) {
+        val assetItems = assetUiMapper.map(
+            positions = positions,
+            rates = rates
+        )
         assetAdapter.submitList(assetItems)
 
-        val portfolioTotal = AssetUiMapper.calculatePortfolioTotalTry(assetItems)
-        totalPortfolioValueText.text = formatTry(portfolioTotal)
+        val portfolioTotal = assetUiMapper.calculatePortfolioTotalTry(
+            positions = positions,
+            rates = rates
+        )
+
+        totalPortfolioValueText.text = if (portfolioTotal == null) {
+            getString(R.string.portfolio_value_unavailable)
+        } else {
+            formatTry(portfolioTotal)
+        }
     }
 
     private fun formatTry(value: BigDecimal): String {
