@@ -16,5 +16,5 @@ package com.isekco.vestia.data.dto
  */
 data class RatesDto(
     val base: String,
-    val rates: Map<String, Double>
+    val rates: Map<String, String>
 )
