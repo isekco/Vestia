@@ -23,7 +23,7 @@ class AppContainer(appContext: Context) {
         .setPrettyPrinting()
         .create()
 
-    val ledgerDataSource = LedgerDataSource(context)
+    val ledgerDataSource = LedgerDataSource(context, gson)
 
     val ledgerRepository: LedgerRepository = LedgerRepositoryImpl(ledgerDataSource,gson)
 

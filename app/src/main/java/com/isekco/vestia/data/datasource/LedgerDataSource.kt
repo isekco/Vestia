@@ -1,41 +1,43 @@
 package com.isekco.vestia.data.datasource
 
 import android.content.Context
+import com.isekco.vestia.data.dto.*
+import com.google.gson.Gson
 import java.io.File
 
 class LedgerDataSource(
     private val context: Context,
-    private val fileName: String = "ledger.json"
+    private val gson: Gson
 ) {
+    private companion object {
+        const val FILE_NAME = "ledger.json"
+    }
     private val localFile: File
-        get() = File(context.filesDir, fileName)
+        get() = File(context.filesDir, FILE_NAME)
 
-    private fun ensureSeeded() {
-        if (localFile.exists()) return
-        context.assets.open(fileName).use { input ->
-            localFile.outputStream().use { output ->
-                input.copyTo(output)
-            }
+    private fun ensureLedgerFileExists() {
+        if (!localFile.exists()){
+            val ledgerDto:LedgerDto = createEmptyLedgerDto()
+            localFile.writeText(gson.toJson(ledgerDto))
         }
     }
 
+    private fun createEmptyLedgerDto() : LedgerDto{
+       return LedgerDto(
+           schemaVersion = 1,
+           baseCurrency = "TRY",
+           owners = emptyList<OwnerDto>(),
+           accounts = emptyList<AccountDto>(),
+           transactions = emptyList<TransactionDto>()
+       )
+    }
+
     fun readLedgerJson(): String {
-        ensureSeeded()
+        ensureLedgerFileExists()
         return localFile.readText()
     }
 
     fun writeLedgerJson(json: String) {
-        ensureSeeded()
-
-        val tmp = File(context.filesDir, "$fileName.tmp")
-        tmp.writeText(json)
-
-        if (localFile.exists()) localFile.delete()
-
-        if (!tmp.renameTo(localFile)) {
-            // renameTo bazen fail olabilir → fallback
-            localFile.writeText(tmp.readText())
-            tmp.delete()
-        }
+        localFile.writeText(json)
     }
 }
