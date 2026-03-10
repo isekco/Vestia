@@ -11,7 +11,7 @@ import java.math.BigDecimal
 /**
  * Converts API DTO to domain model.
  */
-fun RatesDto.toDomain(timestamp: Long): Rates {
+fun RatesDto.toDomain(): Rates {
 
     val currencyMap = rates.mapKeys { (key, _) ->
         Currency.valueOf(key)

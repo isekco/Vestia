@@ -1,11 +1,9 @@
 package com.isekco.vestia.data.datasource
 
 import android.content.Context
+
 import com.google.gson.Gson
 import com.isekco.vestia.data.dto.RatesDto
-import com.isekco.vestia.data.mapper.jsonToRates
-import com.isekco.vestia.data.mapper.ratesToJson
-import com.isekco.vestia.domain.model.Rates
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import com.google.gson.JsonArray
@@ -16,18 +14,22 @@ import java.io.File
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.util.Locale
+import java.text.SimpleDateFormat
+import java.util.TimeZone
 
 class RateDataSource(
     private val context: Context,
     private val gson: Gson
 ) {
-
     companion object {
+
+        /* Local file */
+        const val FILE_NAME = "rates.json"
+
+        /* Connection properties */
         private const val CONNECT_TIMEOUT_MS = 10_000
         private const val READ_TIMEOUT_MS = 10_000
-
-        private const val CACHE_FILE_NAME = "rates.json"
-        private const val ASSET_FILE_NAME = "rates.json"
 
         private const val CURRENCY_RATE_URL =
             "https://static.altinkaynak.com/public/Currency"
@@ -36,7 +38,10 @@ class RateDataSource(
             "https://static.altinkaynak.com/public/Gold"
     }
 
-    suspend fun fetchRates(): RatesDto {
+    private val localFile: File
+        get() = File(context.filesDir, FILE_NAME)
+
+    suspend fun fetchRates(): String {
 
         val currencyRatesJson = fetchRawJson(endpoint = CURRENCY_RATE_URL)
         val goldRatesJson = fetchRawJson(endpoint = GOLD_RATE_URL)
@@ -60,8 +65,20 @@ class RateDataSource(
             throw IllegalStateException("Rate code not found: $kod")
         }
 
-        val result = RatesDto(
+        fun findTimeValue(obj: JsonObject): String {
+            val dateTime = obj["GuncellenmeZamani"].asString
+
+            val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+            sdf.timeZone = TimeZone.getDefault()
+
+            val epochMs = sdf.parse(dateTime)?.time ?: 0L
+
+            return epochMs.toString()
+        }
+
+        val ratesDto = RatesDto(
             base = "TRY",
+            timestamp = findTimeValue(currencyRatesArray[0].asJsonObject),
             rates = mapOf(
                 "USD" to findRateValue(currencyRatesArray, "USD"),
                 "EUR" to findRateValue(currencyRatesArray, "EUR"),
@@ -70,7 +87,7 @@ class RateDataSource(
             )
         )
 
-        return result
+        return gson.toJson(ratesDto)
     }
     private suspend fun fetchRawJson(endpoint : String): String = withContext(Dispatchers.IO)
     {
@@ -90,7 +107,7 @@ class RateDataSource(
 
             if (responseCode !in 200..299) {
                 throw IllegalStateException(
-                    "Rate API request failed. HTTP code: $responseCode"
+                    "Rate API request failed. Endpoint=$endpoint HTTP code=$responseCode"
                 )
             }
 
@@ -107,35 +124,14 @@ class RateDataSource(
         }
     }
 
-    fun readCachedRates(): Rates? {
-        val file = File(context.filesDir, CACHE_FILE_NAME)
-        if (!file.exists()) {
-            return null
-        }
-
-        return try {
-            val json = file.readText(Charsets.UTF_8)
-            jsonToRates(json)
-        } catch (_: Exception) {
-            null
-        }
+    fun readRatesJson(): String? {
+        if (!localFile.exists()) return null
+        return localFile.readText()
     }
 
-    fun readSeedRates(): Rates {
-        val json = context.assets
-            .open(ASSET_FILE_NAME)
-            .bufferedReader(Charsets.UTF_8)
-            .use { it.readText() }
-
-        return jsonToRates(json)
+    fun writeRatesJson(json: String) {
+        localFile.writeText(json)
     }
-
-    fun writeCachedRates(rates: Rates) {
-        val file = File(context.filesDir, CACHE_FILE_NAME)
-        val json = ratesToJson(rates, gson)
-        file.writeText(json, Charsets.UTF_8)
-    }
-
 
 
 }

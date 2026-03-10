@@ -16,5 +16,6 @@ package com.isekco.vestia.data.dto
  */
 data class RatesDto(
     val base: String,
+    val timestamp: String,
     val rates: Map<String, String>
 )
