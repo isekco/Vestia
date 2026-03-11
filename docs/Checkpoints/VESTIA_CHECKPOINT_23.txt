@@ -1,0 +1,72 @@
+VESTIA – CHECKPOINT 23
+Rate Repository Fix & Currency Fetch
+
+Bu checkpoint'te rate çekme mekanizması stabilize edildi ve cache davranışı
+düzeltildi.
+
+Problem
+-------
+Önceki implementasyonda aşağıdaki sorunlar vardı:
+
+- forceRefresh = false olduğu durumda
+  - memory cache boşsa
+  - local rates.json yoksa
+  - repository remote fetch'e gitmiyordu.
+
+- local null durumu sessizce kabul edildiği için
+  uygulama hiç kur çekmeden devam ediyordu.
+
+Bu nedenle asset'ler görünmesine rağmen TL karşılıkları
+hesaplanamıyordu.
+
+Yapılan Düzenlemeler
+--------------------
+
+RateRepositoryImpl yeniden düzenlendi.
+
+Yeni akış:
+
+1) Memory cache kontrol edilir
+   - cached veri varsa ve TTL dolmamışsa kullanılır.
+
+2) Local rates.json kontrol edilir
+   - varsa parse edilir
+   - timestamp TTL içindeyse kullanılır.
+
+3) Remote fetch denenir
+   - Altinkaynak API'den USD/EUR/GBP/XAU çekilir.
+
+4) Remote başarılıysa
+   - rates.json güncellenir
+   - memory cache güncellenir
+
+5) Remote başarısızsa
+   - local veri varsa fallback olarak kullanılır
+
+Cache davranışı
+---------------
+
+Memory cache:
+- uygulama açıkken hızlı erişim sağlar
+
+rates.json:
+- uygulama yeniden açıldığında offline fallback sağlar
+
+TTL:
+15 dakika
+
+Önemli Not
+----------
+
+Remote fetch başarısız olduğunda local fallback
+memory cache'e de yazılır.
+
+Bunun sebebi aynı session içinde tekrar tekrar
+başarısız network denemeleri yapılmasını önlemektir.
+
+Sonuç
+-----
+
+- Kur verileri başarıyla çekiliyor
+- Portfolio TL karşılıkları doğru hesaplanıyor
+- Network hatalarına karşı fallback mekanizması çalışıyor
