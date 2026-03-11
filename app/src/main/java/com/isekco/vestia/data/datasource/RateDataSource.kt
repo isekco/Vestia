@@ -77,7 +77,7 @@ class RateDataSource(
         }
 
         val ratesDto = RatesDto(
-            base = "TRY",
+            baseCurrency = "TRY",
             timestamp = findTimeValue(currencyRatesArray[0].asJsonObject),
             rates = mapOf(
                 "USD" to findRateValue(currencyRatesArray, "USD"),

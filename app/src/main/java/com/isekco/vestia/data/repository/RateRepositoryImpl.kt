@@ -24,12 +24,13 @@ class RateRepositoryImpl(
 
         synchronized(this) {
             if (!forceRefresh) cached?.let { return it }
-        }
+
             val json = dataSource.readRatesJson()
             val dto = gson.fromJson(json, RatesDto::class.java)
             val rates = dto.toDomain()
             cached = rates
-            rates
+            return rates
+        }
     }
 
     override fun invalidate() {

@@ -23,7 +23,7 @@ class AppContainer(appContext: Context) {
     val ledgerDataSource = LedgerDataSource(context, gson)
     val ledgerRepository: LedgerRepository = LedgerRepositoryImpl(ledgerDataSource,gson)
     val rateDataSource = RateDataSource(context, gson)
-    val rateRepository: RateRepository = RateRepositoryImpl(rateDataSource)
+    val rateRepository: RateRepository = RateRepositoryImpl(rateDataSource, gson)
     private val positionEngine: PositionEngine = WacPositionEngine()
     val loadPositionsUseCase: LoadPositionsUseCase =
         LoadPositionsUseCase(

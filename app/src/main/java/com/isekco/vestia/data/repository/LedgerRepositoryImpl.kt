@@ -29,7 +29,7 @@ class LedgerRepositoryImpl(
             val dto = gson.fromJson(json, LedgerDto::class.java)
             val ledger = dto.toDomain()
             cached = ledger
-            ledger
+            return ledger
         }
     }
 

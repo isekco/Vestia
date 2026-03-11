@@ -1,0 +1,66 @@
+VESTIA – CHECKPOINT 22
+Date: 2026-03-10
+
+SUMMARY
+-------
+This checkpoint introduces the initial implementation of the Rates pipeline.
+Rates are now fetched from Altinkaynak API, normalized, stored locally, and
+mapped from DTO to Domain models.
+
+The application builds and runs successfully, but rate values are not yet
+fully integrated into position calculations. Position valuation issues will
+be addressed in the next checkpoint.
+
+IMPLEMENTED
+-----------
+1. RateDataSource
+   - Remote fetch implementation using HttpURLConnection
+   - Altinkaynak Currency and Gold endpoints
+   - JSON parsing using Gson
+   - Local read/write support for rates.json
+
+2. Timestamp Handling
+   - Altinkaynak "GuncellenmeZamani" converted to epoch milliseconds
+   - Stored as String in DTO layer
+
+3. DTO Model
+   RatesDto
+     baseCurrency : String
+     timestamp    : String
+     rates        : Map<String, String>
+
+4. Domain Model
+   Rates
+     baseCurrency : Currency
+     timestamp    : Long
+     rates        : Map<Currency, BigDecimal>
+
+5. Mapper
+   RatesDto -> Rates
+   - Currency string converted to Currency enum
+   - Rate strings converted to BigDecimal
+   - Timestamp string converted to Long
+
+6. Local Storage
+   - rates.json stored in app internal files directory
+   - Same pattern as ledger.json read/write logic
+
+NOTES
+-----
+• Current checkpoint focuses on infrastructure only.
+• PositionEngine integration with rates is not finalized yet.
+• Further validation of rate usage in portfolio calculations is pending.
+
+NEXT STEPS
+----------
+1. Fix rate usage inside PositionEngine
+2. Ensure asset valuation uses correct currency conversions
+3. Add caching strategy for rate refresh
+4. Improve error handling for missing rates
+5. Validate gold (XAU) pricing logic
+
+STATUS
+------
+✔ Build successful
+✔ Application runs
+⚠ Position calculations not yet correct
