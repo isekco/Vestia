@@ -8,7 +8,6 @@ class LoadPositionsUseCase(
     private val ledgerRepository: LedgerRepository,
     private val positionEngine: PositionEngine
 ) {
-
     suspend fun execute(forceRefresh: Boolean = false): List<Position> {
         val ledger = ledgerRepository.getLedger(forceRefresh = forceRefresh)
         return positionEngine.calculate(ledger)

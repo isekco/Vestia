@@ -14,13 +14,7 @@ data class PositionKey(
 
 data class Position(
     val key: PositionKey,
-
-    /** Eldeki toplam adet/miktar */
     val quantity: BigDecimal,
-
-    /** Ağırlıklı ortalama maliyet (WAC) */
     val weightedAverageCost: BigDecimal,
-
-    /** Toplam maliyet = quantity * weightedAverageCost */
     val totalCost: BigDecimal
 )
