@@ -12,8 +12,7 @@ class MainViewModelFactory(
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
             return MainViewModel(
-                loadPositionsUseCase = appContainer.loadPositionsUseCase,
-                loadRatesUseCase = appContainer.loadRatesUseCase
+                loadPortfolioSummaryUseCase = appContainer.loadPortfolioSummaryUseCase
             ) as T
         }
 

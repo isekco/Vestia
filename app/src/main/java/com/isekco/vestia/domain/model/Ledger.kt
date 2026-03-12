@@ -19,6 +19,9 @@ data class Account(
     val name: String,
     val currency: Currency // hesabın native/settlement para birimi
 )
+
+
+
 data class Transaction(
     val id: String,
     val ownerId: String,
@@ -44,7 +47,11 @@ data class Transaction(
     val totalAmount: BigDecimal
         get() = quantity.multiply(unitPrice) // quantity * unitPrice
 
-    val assetKey: String
-        get() = "${assetType.name}|$assetInstrument|${unitType.name}"
+    val assetKey: AssetKey
+        get() = AssetKey(
+            assetType = assetType,
+            assetInstrument = assetInstrument,
+            unitType = unitType
+        )
 }
 

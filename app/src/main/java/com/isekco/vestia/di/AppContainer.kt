@@ -8,12 +8,14 @@ import com.isekco.vestia.data.datasource.RateDataSource
 import com.isekco.vestia.data.repository.LedgerRepositoryImpl
 import com.isekco.vestia.data.repository.RateRepositoryImpl
 import com.isekco.vestia.domain.engine.PositionEngine
-import com.isekco.vestia.domain.engine.WacPositionEngine
+import com.isekco.vestia.domain.engine.ValuationEngine
 import com.isekco.vestia.domain.repository.LedgerRepository
 import com.isekco.vestia.domain.repository.RateRepository
 import com.isekco.vestia.domain.usecase.AddTransactionUseCase
+import com.isekco.vestia.domain.usecase.LoadPortfolioSummaryUseCase
 import com.isekco.vestia.domain.usecase.LoadPositionsUseCase
 import com.isekco.vestia.domain.usecase.LoadRatesUseCase
+import kotlin.random.Random
 
 class AppContainer(appContext: Context) {
     private val context: Context = appContext.applicationContext
@@ -24,16 +26,17 @@ class AppContainer(appContext: Context) {
     val ledgerRepository: LedgerRepository = LedgerRepositoryImpl(ledgerDataSource,gson)
     val rateDataSource = RateDataSource(context, gson)
     val rateRepository: RateRepository = RateRepositoryImpl(rateDataSource, gson)
-    private val positionEngine: PositionEngine = WacPositionEngine()
-    val loadPositionsUseCase: LoadPositionsUseCase =
-        LoadPositionsUseCase(
+    val positionEngine: PositionEngine = PositionEngine()
+    val valuationEngine: ValuationEngine = ValuationEngine()
+
+    val loadPortfolioSummaryUseCase: LoadPortfolioSummaryUseCase =
+        LoadPortfolioSummaryUseCase(
             ledgerRepository = ledgerRepository,
-            positionEngine = positionEngine
+            rateRepository = rateRepository,
+            positionEngine = positionEngine,
+            valuationEngine = valuationEngine
         )
-    val loadRatesUseCase: LoadRatesUseCase =
-        LoadRatesUseCase(
-            rateRepository = rateRepository
-        )
+
     val addTransactionUseCase: AddTransactionUseCase =
         AddTransactionUseCase(
             ledgerRepository = ledgerRepository
