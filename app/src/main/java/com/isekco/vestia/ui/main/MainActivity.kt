@@ -15,7 +15,6 @@ import com.isekco.vestia.R
 import com.isekco.vestia.VestiaApp
 import com.isekco.vestia.domain.model.Position
 import com.isekco.vestia.domain.model.Rates
-import com.isekco.vestia.ui.transaction.AddTransactionActivity
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.math.RoundingMode

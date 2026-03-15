@@ -48,29 +48,8 @@ class ValuationEngine {
         val assetKey = position.key.assetKey
 
         return when (assetKey.assetType) {
-            AssetType.CASH -> resolveCashRate(assetKey, rates)
-            AssetType.XAU -> resolveXAURate(assetKey, rates)
+            AssetType.CASH -> rates.cashRates[assetKey.assetInstrument]
+            AssetType.XAU -> rates.xauRates[assetKey.assetInstrument]
         }
-    }
-
-    private fun resolveCashRate( assetKey: AssetKey, rates: Rates): BigDecimal? {
-
-        val currency =
-
-            try {
-                Currency.valueOf(assetKey.assetInstrument)
-            } catch (_: IllegalArgumentException) {
-                return null
-            }
-
-        if (currency == rates.baseCurrency) {
-            return BigDecimal.ONE
-        }
-
-        return rates.rates[currency]
-    }
-
-    private fun resolveXAURate(  assetKey: AssetKey, rates: Rates ): BigDecimal? {
-        return null
     }
 }

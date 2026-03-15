@@ -20,9 +20,8 @@ data class TransactionDto(
     val transactionType: String,
     val assetType: String,
     val assetInstrument: String,
-    val unitType: String,
     val quantity: String,
-    val unitPrice: String,
+    val unitPrice: String, // In terms of base currency (TRY/AssetInstrument)
     val priceCurrency: String,
     val tags: String?
 )

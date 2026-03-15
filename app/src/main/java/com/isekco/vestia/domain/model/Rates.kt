@@ -22,5 +22,6 @@ import java.math.BigDecimal
 data class Rates(
     val baseCurrency: Currency,
     val timestamp: Long,
-    val rates: Map<Currency, BigDecimal>
+    val cashRates: Map<CashInstrument, BigDecimal>,
+    val xauRates: Map<XauInstrument, BigDecimal>
 )

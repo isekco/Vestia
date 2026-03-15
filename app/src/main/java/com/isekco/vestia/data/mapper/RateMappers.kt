@@ -2,8 +2,10 @@ package com.isekco.vestia.data.mapper
 
 
 import com.isekco.vestia.data.dto.RatesDto
+import com.isekco.vestia.domain.model.CashInstrument
 import com.isekco.vestia.domain.model.Currency
 import com.isekco.vestia.domain.model.Rates
+import com.isekco.vestia.domain.model.XauInstrument
 import java.math.BigDecimal
 
 /**
@@ -11,14 +13,20 @@ import java.math.BigDecimal
  */
 fun RatesDto.toDomain(): Rates {
 
-    val domainRates: Map<Currency, BigDecimal> =
-        rates.map {
-            (key, value) -> Currency.valueOf(key) to BigDecimal(value)
+    val cRates: Map<CashInstrument, BigDecimal> =
+        cashRates.map { (key, value) ->
+            CashInstrument.valueOf(key) to BigDecimal(value)
+        }.toMap()
+
+    val xRates: Map<XauInstrument, BigDecimal> =
+        xauRates.map { (key, value) ->
+            XauInstrument.valueOf(key) to BigDecimal(value)
         }.toMap()
 
     return Rates(
         baseCurrency = Currency.valueOf(baseCurrency),
         timestamp = timestamp.toLong(),
-        rates = domainRates
+        cashRates = cRates,
+        xauRates = xRates,
     )
 }

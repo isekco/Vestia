@@ -4,7 +4,7 @@ import com.isekco.vestia.data.dto.*
 import com.isekco.vestia.domain.model.Ledger.*
 import com.isekco.vestia.domain.model.*
 import java.math.BigDecimal
-import java.util.Locale
+
 
 /**
  * DTO (JSON/storage format) -> Domain (business model) mappers.
@@ -12,13 +12,6 @@ import java.util.Locale
  * Design:
  * - Single entry point: [LedgerDto.toDomain].
  * - All other mapping helpers are private to prevent partial/inconsistent mappings.
- *
- * Notes:
- * - Ledger.baseCurrency comes from the root and represents reporting base currency.
- * - Account.currency is the account's native/settlement currency.
- * - Transaction.priceCurrency is the currency of unitPrice.
- * - JSON fields like quantity/unitPrice may be stored as String; domain uses BigDecimal.
- * - Derived values (e.g., totalAmount, assetKey, direction) are computed in domain, not stored in JSON.
  */
 internal fun LedgerDto.toDomain(): Ledger {
     val ownersDomain: List<Owner> = owners.map {it.toDomain() }
@@ -37,7 +30,7 @@ internal fun LedgerDto.toDomain(): Ledger {
 
     return Ledger(
         schemaVersion = schemaVersion,
-        baseCurrency = parseEnumNormalized(raw = baseCurrency, fieldName = "baseCurrency", ctx = "ledger"),
+        baseCurrency = Currency.valueOf(baseCurrency.trim().uppercase()),
         owners = ownersDomain,
         accounts = accountsDomain,
         transactions = transactionsDomain
@@ -65,8 +58,7 @@ private fun AccountDto.toDomain(): Account {
     require(name.isNotBlank()) { "Account.name must not be blank (accountId=$id)" }
     require(currency.isNotBlank()) { "Account.currency must not be blank (accountId=$id)" }
 
-    val cur: Currency =
-        parseEnumNormalized(raw = currency, fieldName = "currency", ctx = "accountId=$id")
+    val cur: Currency = Currency.valueOf(currency.trim().uppercase())
 
     return Account(
         id = id,
@@ -105,23 +97,23 @@ private fun TransactionDto.toDomain(
         "Owner/account mismatch: tx.ownerId=$ownerId, account.ownerId=${account.ownerId} (txId=$id)"
     }
 
-    val txType: TransactionType =
-        parseEnumNormalized(raw = transactionType, fieldName = "transactionType", ctx = "txId=$id")
+    val txType: TransactionType = TransactionType.valueOf(transactionType.trim().uppercase())
 
-    val aType: AssetType =
-        parseAssetType(raw = assetType, ctx = "txId=$id")
+    val aType: AssetType = AssetType.valueOf(assetType.trim().uppercase())
 
-    val uType: UnitType =
-        parseUnitType(raw = unitType, ctx = "txId=$id")
+    val aInst: AssetInstrument =
 
-    val qty: BigDecimal =
-        parseBigDecimal(raw = quantity, fieldName = "quantity", ctx = "txId=$id")
+        when(aType) {
 
-    val price: BigDecimal =
-        parseBigDecimal(raw = unitPrice, fieldName = "unitPrice", ctx = "txId=$id")
+            AssetType.CASH -> (CashInstrument.valueOf(assetInstrument.trim().uppercase()))
 
-    val pCur: Currency =
-        parseEnumNormalized(raw = priceCurrency, fieldName = "priceCurrency", ctx = "txId=$id")
+            AssetType.XAU -> (XauInstrument.valueOf(assetInstrument.trim().uppercase()))
+        }
+
+
+    val qty: BigDecimal = BigDecimal(quantity.trim())
+
+    val price: BigDecimal = BigDecimal(unitPrice.trim())
 
     require(qty > BigDecimal.ZERO) { "quantity must be > 0 (txId=$id)" }
     require(price >= BigDecimal.ZERO) { "unitPrice must be >= 0 (txId=$id)" }
@@ -135,108 +127,11 @@ private fun TransactionDto.toDomain(
         transactionType = txType,
 
         assetType = aType,
-        assetInstrument = assetInstrument,
-        unitType = uType,
+        assetInstrument = aInst,
 
         quantity = qty,
         unitPrice = price,
-        priceCurrency = pCur,
 
         tags = tags?.takeIf { it.isNotBlank() }
     )
-}
-
-/* -------------------------------------------------------------------------
- * Helpers
- * ------------------------------------------------------------------------- */
-
-/**
- * Parses a BigDecimal from a raw String.
- *
- * We intentionally do NOT enforce any fixed scale here.
- * Formatting/rounding is a presentation/reporting concern.
- */
-private fun parseBigDecimal(
-    raw: String,
-    fieldName: String,
-    ctx: String
-): BigDecimal {
-    val s = raw.trim()
-    require(s.isNotEmpty()) { "$fieldName must not be blank ($ctx)" }
-    return try {
-        BigDecimal(s)
-    } catch (e: NumberFormatException) {
-        error("$fieldName cannot be parsed as BigDecimal: '$raw' ($ctx)")
-    }
-}
-
-/**
- * Normalizes and parses enum values coming from JSON.
- *
- * Normalization rules:
- * - trim()
- * - uppercase(Locale.ROOT) to avoid locale-specific issues (e.g., Turkish i/I)
- */
-private inline fun <reified T : Enum<T>> parseEnumNormalized(
-    raw: String,
-    fieldName: String,
-    ctx: String
-): T {
-    val s = raw.trim()
-    require(s.isNotEmpty()) { "$fieldName must not be blank ($ctx)" }
-    val normalized = s.uppercase(Locale.ROOT)
-    return try {
-        enumValueOf<T>(normalized)
-    } catch (e: IllegalArgumentException) {
-        val allowed = enumValues<T>().joinToString(", ") { it.name }
-        error("$fieldName cannot be parsed as enum: '$raw' ($ctx). Allowed: $allowed")
-    }
-}
-
-/**
- * Maps incoming unit strings to [UnitType].
- *
- * Keep this mapping conservative and explicit; unknown values should fail fast.
- */
-private fun parseUnitType(
-    raw: String,
-    ctx: String
-): UnitType {
-    val s = raw.trim().lowercase(Locale.ROOT)
-    require(s.isNotEmpty()) { "unitType must not be blank ($ctx)" }
-
-    return when (s) {
-        // Weight
-        "g", "gram" -> UnitType.GRAM
-        "ons", "ounce" -> UnitType.OUNCE
-
-        // Currency-like unit labels (if your JSON provides these as unit)
-        "try" -> UnitType.TRY
-        "usd" -> UnitType.USD
-        "eur" -> UnitType.EUR
-        "gbp" -> UnitType.GBP
-
-        else -> error("Unknown unitType: '$raw' ($ctx)")
-    }
-}
-
-/**
- * Maps incoming asset type strings to [AssetType].
- *
- * Notes:
- * - XAU is explicitly treated as gold.
- * - If JSON sends currencies as assetType (TRY/USD/EUR/GBP), we map them to CASH.
- */
-private fun parseAssetType(
-    raw: String,
-    ctx: String
-): AssetType {
-    val s = raw.trim().uppercase(Locale.ROOT)
-    require(s.isNotEmpty()) { "assetType must not be blank ($ctx)" }
-
-    return when (s) {
-        "XAU" -> AssetType.XAU
-        "TRY", "USD", "EUR", "GBP" -> AssetType.CASH
-        else -> error("Unknown assetType: '$raw' ($ctx)")
-    }
 }

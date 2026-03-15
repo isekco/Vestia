@@ -17,10 +17,8 @@ data class Account(
     val id: String,
     val ownerId: String,
     val name: String,
-    val currency: Currency // hesabın native/settlement para birimi
+    val currency: Currency // Currency of account
 )
-
-
 
 data class Transaction(
     val id: String,
@@ -31,16 +29,13 @@ data class Transaction(
     val transactionType: TransactionType,
 
     val assetType: AssetType,
-    val assetInstrument: String,
-    val unitType: UnitType,
+    val assetInstrument: AssetInstrument,
 
     val quantity: BigDecimal,
-    val unitPrice: BigDecimal,
-    val priceCurrency: Currency,
+    val unitPrice: BigDecimal, // In terms of Base Currency (TRY for now) (TRY/AssetInstrument)
 
     val tags: String?
 ) {
-
     val direction: TransactionDirection
         get() = transactionType.direction
 
@@ -51,7 +46,6 @@ data class Transaction(
         get() = AssetKey(
             assetType = assetType,
             assetInstrument = assetInstrument,
-            unitType = unitType
         )
 }
 

@@ -17,9 +17,8 @@ class PositionEngine {
     private val scale = 10
     private val roundingMode = RoundingMode.HALF_UP
     fun calculate(ledger: Ledger): List<Position> {
-        if (ledger.transactions.isEmpty()) {
-            return emptyList()
-        }
+
+        if (ledger.transactions.isEmpty()) { return emptyList() }
 
         val grouped = ledger.transactions.groupBy { tx -> buildPositionKey(tx) }
         val positions = mutableListOf<Position>()
@@ -31,7 +30,6 @@ class PositionEngine {
                 positions.add(position)
             }
         }
-
         return positions
     }
 
@@ -47,6 +45,7 @@ class PositionEngine {
         key: PositionKey,
         transactions: List<Transaction>
     ): Position {
+
         var quantity = BigDecimal.ZERO
         var totalCost = BigDecimal.ZERO
 
@@ -54,6 +53,7 @@ class PositionEngine {
 
         for (tx in sortedTransactions) {
             when (tx.direction) {
+
                 TransactionDirection.IN -> {
                     val cost = tx.quantity.multiply(tx.unitPrice)
                     quantity = quantity.add(tx.quantity)
@@ -68,6 +68,8 @@ class PositionEngine {
                     val weightedAverageCost =
                         totalCost.divide(quantity, scale, roundingMode)
                     val sellCost = tx.quantity.multiply(weightedAverageCost)
+
+                    /* Burada sellCost Wac ile hesaplanıyor. Bir de gerçek satış yapıldıktan sonra realized diye bişey olması lazım */
 
                     quantity = quantity.subtract(tx.quantity)
                     totalCost = totalCost.subtract(sellCost)
@@ -93,7 +95,7 @@ class PositionEngine {
         return Position(
             key = key,
             quantity = quantity,
-            weightedAverageCost = finalWeightedAverageCost,
+            wac = finalWeightedAverageCost,
             totalCost = totalCost
         )
     }

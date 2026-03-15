@@ -1,0 +1,32 @@
+VESTIA CHECKPOINT – Domain Valuation Refactor
+
+Summary
+-------
+Domain model was refactored to support a cleaner valuation flow.
+
+Completed
+---------
+- Removed legacy / unnecessary old files
+- Simplified PositionEngine into a direct concrete engine
+- Added ValuationEngine as separate calculation step
+- Refactored asset model around:
+  - AssetType: CASH, XAU
+  - CashInstrument
+  - XauInstrument
+- Updated rate model to support separate rate groups for CASH and XAU
+- Improved domain structure so valuation logic can directly resolve rates
+  without string parsing hacks
+- Cleaned project tree and package layout
+
+Current Status
+--------------
+Project is intentionally committed in an intermediate state.
+Build is currently broken because UI layer and Add Transaction flow
+have not yet been adapted to the new domain model.
+
+Next Steps
+----------
+- Update UI mapping to new valuation/domain structures
+- Reconnect MainViewModel / MainUiState flow
+- Adapt Add Transaction screen and input model
+- Restore successful build

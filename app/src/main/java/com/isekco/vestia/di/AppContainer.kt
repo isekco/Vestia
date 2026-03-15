@@ -11,10 +11,7 @@ import com.isekco.vestia.domain.engine.PositionEngine
 import com.isekco.vestia.domain.engine.ValuationEngine
 import com.isekco.vestia.domain.repository.LedgerRepository
 import com.isekco.vestia.domain.repository.RateRepository
-import com.isekco.vestia.domain.usecase.AddTransactionUseCase
 import com.isekco.vestia.domain.usecase.LoadPortfolioSummaryUseCase
-import com.isekco.vestia.domain.usecase.LoadPositionsUseCase
-import com.isekco.vestia.domain.usecase.LoadRatesUseCase
 import kotlin.random.Random
 
 class AppContainer(appContext: Context) {
@@ -35,10 +32,5 @@ class AppContainer(appContext: Context) {
             rateRepository = rateRepository,
             positionEngine = positionEngine,
             valuationEngine = valuationEngine
-        )
-
-    val addTransactionUseCase: AddTransactionUseCase =
-        AddTransactionUseCase(
-            ledgerRepository = ledgerRepository
         )
 }

@@ -59,7 +59,7 @@ class RateDataSource(
             for (element in array) {
                 val obj = element.asJsonObject
                 if (obj["Kod"].asString == kod) {
-                    return normalizeTRValueType(obj["Satis"].asString)
+                    return normalizeTRValueType(obj["Alis"].asString)
                 }
             }
             throw IllegalStateException("Rate code not found: $kod")
@@ -79,11 +79,16 @@ class RateDataSource(
         val ratesDto = RatesDto(
             baseCurrency = "TRY",
             timestamp = findTimeValue(currencyRatesArray[0].asJsonObject),
-            rates = mapOf(
+            cashRates = mapOf(
                 "USD" to findRateValue(currencyRatesArray, "USD"),
                 "EUR" to findRateValue(currencyRatesArray, "EUR"),
-                "GBP" to findRateValue(currencyRatesArray, "GBP"),
-                "XAU" to findRateValue(goldRatesArray, "GA")
+                "GBP" to findRateValue(currencyRatesArray, "GBP")
+            ),
+            xauRates = mapOf(
+                "GRAM" to findRateValue(goldRatesArray, "GA"),
+                "CEYREK" to findRateValue(goldRatesArray, "C"),
+                "YARIM" to findRateValue(goldRatesArray, "Y"),
+                "TAM" to findRateValue(goldRatesArray, "T")
             )
         )
 
