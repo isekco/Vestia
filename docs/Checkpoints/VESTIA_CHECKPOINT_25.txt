@@ -1,0 +1,87 @@
+Vestia – Checkpoint 25
+UI Layer Reconnected (Flat Asset List)
+
+## Summary
+
+UI layer was rebuilt after previous cleanup where UI logic was removed and only XML layouts were preserved.
+
+This checkpoint restores the UI pipeline with a clean architecture:
+
+Domain → ViewModel → UI State → Activity → RecyclerView Adapter → XML Layout
+
+## Key Decisions
+
+* UI currently shows a **flat asset list** (no grouping).
+* Asset name displayed in UI corresponds directly to **AssetInstrument**.
+* Advanced grouping modes (ShowByAsset / ShowByAccount / ShowByOwner) are postponed.
+* Domain models (Position, ValuedPosition) remain unchanged.
+
+## Implemented Components
+
+1. AssetUiModel
+
+   * UI projection model for a single asset row.
+
+2. MainUiState
+
+   * Screen state container.
+   * Holds:
+
+     * totalPortfolioValueText
+     * asset list
+     * loading flag
+     * optional error message
+
+3. AssetAdapter
+
+   * RecyclerView adapter using `item_asset_summary.xml`
+   * Responsible only for rendering AssetUiModel rows.
+
+4. MainViewModel
+
+   * Owns the UI state.
+   * Uses StateFlow to publish screen state.
+   * Currently loads preview data during init.
+   * Future step: connect domain use cases.
+
+5. MainActivity
+
+   * No longer produces data.
+   * Observes `uiState` from ViewModel.
+   * Calls render(state) on updates.
+   * Passes asset list to adapter.
+
+## Architecture
+
+MainViewModel
+↓
+StateFlow<MainUiState>
+↓
+MainActivity.observeUiState()
+↓
+render(state)
+↓
+AssetAdapter.submitList()
+↓
+RecyclerView
+↓
+item_asset_summary.xml
+
+## Notes
+
+* Rotation safe due to ViewModel usage.
+* StateFlow ensures latest state is delivered to new collectors.
+* Pull-to-refresh (SwipeRefreshLayout) postponed.
+* Domain → UI mapper and real data binding will be implemented in the next checkpoint.
+
+## Next Step
+
+Connect real domain data:
+
+ValuedPosition
+↓
+AssetUiModel mapper
+↓
+MainUiState update
+↓
+RecyclerView rendering
