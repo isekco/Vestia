@@ -13,8 +13,10 @@ class ValuationEngine {
 
     private val moneyScale = 2
     private val roundingMode = RoundingMode.HALF_UP
-    fun calculate( positions: List<Position>, rates: Rates): List<ValuedPosition> {
-        if (positions.isEmpty()) { return emptyList() }
+    fun calculate(positions: List<Position>, rates: Rates): List<ValuedPosition> {
+        if (positions.isEmpty()) {
+            return emptyList()
+        }
 
         val valuedPositions = mutableListOf<ValuedPosition>()
 
@@ -43,7 +45,7 @@ class ValuationEngine {
         return valuedPositions
     }
 
-    private fun resolveRateToBase( position: Position, rates: Rates): BigDecimal? {
+    private fun resolveRateToBase(position: Position, rates: Rates): BigDecimal? {
 
         val assetKey = position.key.assetKey
 

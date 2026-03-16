@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.tooling.core.linearClosure
+
 plugins {
     alias(libs.plugins.android.application)
 }
@@ -40,6 +42,7 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.lifecycle.viewmodel.ktx)
     implementation(libs.coroutines.android)
     implementation(libs.gson)
     testImplementation(libs.junit)

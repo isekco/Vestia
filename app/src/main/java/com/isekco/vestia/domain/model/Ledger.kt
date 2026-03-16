@@ -9,10 +9,12 @@ data class Ledger(
     val accounts: List<Account>,
     val transactions: List<Transaction>
 )
+
 data class Owner(
     val id: String,
     val name: String
 )
+
 data class Account(
     val id: String,
     val ownerId: String,

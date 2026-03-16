@@ -41,7 +41,7 @@ class RateDataSource(
     private val localFile: File
         get() = File(context.filesDir, FILE_NAME)
 
-     suspend fun fetchRates(): String {
+    suspend fun fetchRates(): String {
 
         val currencyRatesJson = fetchRawJson(endpoint = CURRENCY_RATE_URL)
         val goldRatesJson = fetchRawJson(endpoint = GOLD_RATE_URL)
@@ -94,7 +94,8 @@ class RateDataSource(
 
         return gson.toJson(ratesDto)
     }
-    private suspend fun fetchRawJson(endpoint : String): String = withContext(Dispatchers.IO)
+
+    private suspend fun fetchRawJson(endpoint: String): String = withContext(Dispatchers.IO)
     {
         val url = URL(endpoint)
 

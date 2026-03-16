@@ -18,7 +18,9 @@ class PositionEngine {
     private val roundingMode = RoundingMode.HALF_UP
     fun calculate(ledger: Ledger): List<Position> {
 
-        if (ledger.transactions.isEmpty()) { return emptyList() }
+        if (ledger.transactions.isEmpty()) {
+            return emptyList()
+        }
 
         val grouped = ledger.transactions.groupBy { tx -> buildPositionKey(tx) }
         val positions = mutableListOf<Position>()

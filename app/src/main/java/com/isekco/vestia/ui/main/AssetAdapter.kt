@@ -35,12 +35,22 @@ class AssetAdapter : RecyclerView.Adapter<AssetAdapter.AssetViewHolder>() {
         private val assetQuantityValueText: TextView = itemView.findViewById(R.id.assetQuantityText)
         private val assetRateValueText: TextView = itemView.findViewById(R.id.assetRateText)
         private val assetTotalValueText: TextView = itemView.findViewById(R.id.assetValueTlText)
+        private val assetColorIndicator: View = itemView.findViewById(R.id.assetColorIndicator)
 
         fun bind(item: AssetUiModel) {
             assetNameText.text = item.assetName
             assetQuantityValueText.text = item.quantityText
             assetRateValueText.text = item.rateText
             assetTotalValueText.text = item.totalValueText
+
+            when (item.assetName) {
+
+                "USD" -> assetColorIndicator.setBackgroundResource(R.drawable.bg_legend_dot_usd)
+                "EUR" -> assetColorIndicator.setBackgroundResource(R.drawable.bg_legend_dot_eur)
+                "GBP" -> assetColorIndicator.setBackgroundResource(R.drawable.bg_legend_dot_gbp)
+                else -> assetColorIndicator.setBackgroundResource(R.drawable.bg_legend_dot_xau)
+            }
+
         }
     }
 }

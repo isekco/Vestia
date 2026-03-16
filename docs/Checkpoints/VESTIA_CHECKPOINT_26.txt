@@ -1,0 +1,218 @@
+Vestia — Checkpoint 26
+MainViewModel UI Mapping + Large Ledger Dataset
+
+------------------------------------------------------------
+Amaç
+------------------------------------------------------------
+
+Bu checkpoint’in amacı:
+
+- Domain katmanından gelen ValuedPosition verilerini UI için dönüştürmek
+- MainViewModel üzerinden MainUiState üretmek
+- UI tarafında StateFlow collect mekanizması ile ekranı güncellemek
+- Gerçekçi bir ledger.json dataset ile sistemi test etmek
+
+------------------------------------------------------------
+1. MainViewModel UI Mapping
+------------------------------------------------------------
+
+MainViewModel içerisinde:
+
+loadPortfolioSummary()
+
+fonksiyonu init sırasında tetiklenir.
+
+Akış şu şekilde çalışır:
+
+LoadPortfolioSummaryUseCase
+        ↓
+List<ValuedPosition>
+        ↓
+AssetUiMapper
+        ↓
+List<AssetUiModel>
+        ↓
+MainUiState
+        ↓
+StateFlow emit
+        ↓
+MainActivity collect()
+        ↓
+render()
+
+------------------------------------------------------------
+2. AssetUiMapper
+------------------------------------------------------------
+
+ValuedPosition → UI dönüşümü burada yapılır.
+
+Kullanılan fonksiyonlar:
+
+toAssetUiModels()
+toTotalPortfolioValueText()
+
+------------------------------------------------------------
+toAssetUiModels()
+------------------------------------------------------------
+
+Amaç:
+
+List<ValuedPosition>
+↓
+List<AssetUiModel>
+
+Burada yapılan işlemler:
+
+- aynı asset’leri AssetKey ile grupla
+- toplam quantity hesapla
+- rate ve market value hesapla
+- UI için text formatı üret
+
+------------------------------------------------------------
+Quantity hesaplama
+------------------------------------------------------------
+
+val totalQuantity = items
+    .map { it.position.quantity }
+    .fold(BigDecimal.ZERO, BigDecimal::add)
+
+Bu işlem şu anlama gelir:
+
+map → listedeki her elemandan quantity değerini al
+fold → tüm quantity değerlerini topla
+
+Sonuç:
+
+totalQuantity = tüm hesaplardan gelen aynı asset miktarlarının toplamı
+
+------------------------------------------------------------
+3. MainUiState Güncelleme
+------------------------------------------------------------
+
+MainViewModel içerisinde:
+
+_uiState.value = MainUiState(
+    assets = assetUiModels,
+    totalPortfolioValueText = totalText
+)
+
+Bu işlem StateFlow üzerinden UI’a yeni state gönderir.
+
+------------------------------------------------------------
+4. UI Tarafı
+------------------------------------------------------------
+
+MainActivity içerisinde:
+
+viewModel.uiState.collect { state ->
+    render(state)
+}
+
+collect mekanizması sayesinde:
+
+- State değiştiğinde
+- otomatik olarak render() çalışır
+
+render fonksiyonu:
+
+AssetAdapter.submitList(state.assets)
+
+ile RecyclerView’i günceller.
+
+Toplam portföy değeri de TextView’e yazılır.
+
+------------------------------------------------------------
+5. Büyük Test Dataset
+------------------------------------------------------------
+
+UI’ı test edebilmek için büyük bir ledger.json oluşturuldu.
+
+Dataset özellikleri:
+
+- 3 Owner
+- Her owner altında 4 account
+- Toplam 12 account
+- Her account altında ~10 transaction
+- Toplam ~120 transaction
+
+Asset dağılımı:
+
+CASH hesapları
+- BUY
+- SELL
+
+XAU hesapları
+- BUY
+- SELL
+- GIFT_IN
+- GIFT_OUT
+
+Bu dataset sayesinde:
+
+- PositionEngine
+- ValuationEngine
+- AssetUiMapper
+- RecyclerView rendering
+
+gerçek veri ile test edilebildi.
+
+------------------------------------------------------------
+6. Bilinen Problemler (TODO)
+------------------------------------------------------------
+
+1. AssetUiMapper içerisinde total cost şu an yaklaşık hesaplanıyor:
+
+totalCost ≈ quantity * rate
+
+Bu doğru bir maliyet hesabı değildir.
+
+Gerçek maliyet hesaplaması için:
+
+transaction bazlı cost basis tutulmalıdır.
+
+TODO: gerçek cost hesaplaması eklenmeli.
+
+------------------------------------------------------------
+
+2. Ortalama maliyet (average cost)
+
+Asset bazında hesaplanamıyor çünkü:
+
+- aynı asset
+- farklı owner
+- farklı account
+
+içerisinde farklı maliyetler olabilir.
+
+Bu nedenle ortalama maliyet hesaplaması:
+
+- account bazlı
+veya
+- position engine seviyesinde yapılmalıdır.
+
+TODO: account level cost model tasarlanacak.
+
+------------------------------------------------------------
+
+3. TRY Rate Sorunu
+
+TRY base currency olduğu için:
+
+TRY → TRY rate bulunamıyor.
+
+Bu yüzden:
+
+TRY asset'lerde market value görünmüyor.
+
+TODO: base currency için implicit rate = 1 uygulanmalı.
+
+------------------------------------------------------------
+Checkpoint Sonucu
+------------------------------------------------------------
+
+Bu checkpoint sonunda:
+
+- Domain → UI mapping tamamlandı
+- StateFlow → UI render pipeline çalışıyor
+- Büyük ledger dataset ile uygulama test edildi
+- Asset listesi ve portfolio summary ekranda görüntüleniyor

@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.isekco.vestia.R
+import com.isekco.vestia.VestiaApp
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
@@ -20,8 +21,11 @@ class MainActivity : AppCompatActivity() {
     private lateinit var assetRecyclerView: RecyclerView
     private lateinit var addTransactionFab: FloatingActionButton
     private lateinit var assetAdapter: AssetAdapter
-
-    private val viewModel: MainViewModel by viewModels()
+    private val viewModel: MainViewModel by viewModels(){
+        MainViewModelFactory(
+            (application as VestiaApp).container.loadPortfolioSummaryUseCase
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,7 +35,6 @@ class MainActivity : AppCompatActivity() {
         setupRecyclerView()
         setupClicks()
         observeUiState()
-
     }
 
     private fun bindViews() {
@@ -62,11 +65,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun render(state: MainUiState)  {
+    private fun render(state: MainUiState) {
         totalPortfolioValueText.text = state.totalPortfolioValueText
         assetAdapter.submitList(state.assets)
 
-        state.errorMessage?.let{ message ->
+        state.errorMessage?.let { message ->
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
         }
     }

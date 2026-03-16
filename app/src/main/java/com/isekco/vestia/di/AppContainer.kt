@@ -20,7 +20,7 @@ class AppContainer(appContext: Context) {
         .setPrettyPrinting()
         .create()
     val ledgerDataSource = LedgerDataSource(context, gson)
-    val ledgerRepository: LedgerRepository = LedgerRepositoryImpl(ledgerDataSource,gson)
+    val ledgerRepository: LedgerRepository = LedgerRepositoryImpl(ledgerDataSource, gson)
     val rateDataSource = RateDataSource(context, gson)
     val rateRepository: RateRepository = RateRepositoryImpl(rateDataSource, gson)
     val positionEngine: PositionEngine = PositionEngine()

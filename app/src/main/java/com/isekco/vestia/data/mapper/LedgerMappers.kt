@@ -14,7 +14,7 @@ import java.math.BigDecimal
  * - All other mapping helpers are private to prevent partial/inconsistent mappings.
  */
 internal fun LedgerDto.toDomain(): Ledger {
-    val ownersDomain: List<Owner> = owners.map {it.toDomain() }
+    val ownersDomain: List<Owner> = owners.map { it.toDomain() }
     val accountsDomain: List<Account> = accounts.map { it.toDomain() }
 
     // Lookup structures for validation and fast joins.
@@ -103,7 +103,7 @@ private fun TransactionDto.toDomain(
 
     val aInst: AssetInstrument =
 
-        when(aType) {
+        when (aType) {
 
             AssetType.CASH -> (CashInstrument.valueOf(assetInstrument.trim().uppercase()))
 

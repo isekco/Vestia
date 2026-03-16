@@ -25,8 +25,8 @@
 
             <View
                 android:id="@+id/assetColorIndicator"
-                android:layout_width="12dp"
-                android:layout_height="12dp"
+                android:layout_width="11dp"
+                android:layout_height="11dp"
                 android:layout_marginEnd="10dp"
                 android:background="@drawable/bg_legend_dot_usd" />
 

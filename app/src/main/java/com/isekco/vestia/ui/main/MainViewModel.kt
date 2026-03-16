@@ -1,70 +1,50 @@
 package com.isekco.vestia.ui.main
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.isekco.vestia.domain.usecase.LoadPortfolioSummaryUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val loadPortfolioSummaryUseCase: LoadPortfolioSummaryUseCase
+) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MainUiState())
+    private val _uiState = MutableStateFlow(MainUiState(isLoading = true))
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
     init {
-        loadPreviewData()
+        loadPortfolioSummary()
     }
 
-    private fun loadPreviewData() {
-        val previewAssets = listOf(
-            AssetUiModel(
-                assetName = "USD",
-                quantityText = "1250.00",
-                rateText = "38.12",
-                totalValueText = "₺47,650.00"
-            ),
-            AssetUiModel(
-                assetName = "EUR",
-                quantityText = "820.00",
-                rateText = "41.27",
-                totalValueText = "₺33,841.40"
-            ),
-            AssetUiModel(
-                assetName = "GBP",
-                quantityText = "150.00",
-                rateText = "48.30",
-                totalValueText = "₺7,245.00"
-            ),
-            AssetUiModel(
-                assetName = "TRY",
-                quantityText = "12,500.00",
-                rateText = "1.00",
-                totalValueText = "₺12,500.00"
-            ),
-            AssetUiModel(
-                assetName = "GRAM",
-                quantityText = "18.50",
-                rateText = "---",
-                totalValueText = "---"
-            ),
-            AssetUiModel(
-                assetName = "CEYREK",
-                quantityText = "6.00",
-                rateText = "---",
-                totalValueText = "---"
-            ),
-            AssetUiModel(
-                assetName = "TAM",
-                quantityText = "1.00",
-                rateText = "---",
-                totalValueText = "---"
+    fun loadPortfolioSummary(forceRefresh: Boolean = false) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMessage = null
             )
-        )
 
-        _uiState.value = MainUiState(
-            isLoading = false,
-            totalPortfolioValueText = "---",
-            assets = previewAssets,
-            errorMessage = null
-        )
+            try {
+                val valuedPositions = loadPortfolioSummaryUseCase.execute(forceRefresh)
+
+                val assetItems = AssetUiMapper.toAssetUiModels(valuedPositions)
+                val totalPortfolioValueText =
+                    AssetUiMapper.toTotalPortfolioValueText(valuedPositions)
+
+                _uiState.value = MainUiState(
+                    isLoading = false,
+                    totalPortfolioValueText = totalPortfolioValueText,
+                    assets = assetItems,
+                    errorMessage = null
+                )
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Portfolio yüklenirken beklenmeyen bir hata oluştu."
+                )
+            }
+        }
     }
 }
