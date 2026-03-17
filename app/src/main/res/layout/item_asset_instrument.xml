@@ -2,56 +2,75 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:gravity="center_vertical"
     android:paddingTop="6dp"
     android:paddingBottom="6dp">
-
-    <!-- Instrument Name -->
 
     <TextView
         android:id="@+id/instrumentNameText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
-        android:text="USD Cash"
-        android:textSize="14sp"
-        android:textColor="@color/vestia_text_secondary"
+        android:layout_weight="1.20"
+        android:ellipsize="end"
+        android:gravity="start"
         android:maxLines="1"
-        android:ellipsize="end"/>
-
-    <!-- Quantity -->
+        android:text="USD"
+        android:textColor="@color/vestia_text_primary"
+        android:textSize="@dimen/text_asset_instrument_title"
+        android:textStyle="bold"
+        app:autoSizeMaxTextSize="@dimen/text_asset_instrument_title_max"
+        app:autoSizeMinTextSize="@dimen/text_asset_instrument_title_min"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform" />
 
     <TextView
         android:id="@+id/instrumentQuantityText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="0.95"
+        android:gravity="end"
+        android:paddingStart="8dp"
         android:text="1200"
-        android:textSize="14sp"
         android:textColor="@color/vestia_text_secondary"
-        android:layout_marginEnd="10dp"/>
-
-    <!-- Rate -->
+        android:textSize="@dimen/text_asset_instrument_info"
+        app:autoSizeMaxTextSize="@dimen/text_asset_instrument_info_max"
+        app:autoSizeMinTextSize="@dimen/text_asset_instrument_info_min"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform" />
 
     <TextView
         android:id="@+id/instrumentRateText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="0.95"
+        android:gravity="end"
+        android:paddingStart="8dp"
         android:text="32.10"
-        android:textSize="14sp"
         android:textColor="@color/vestia_text_secondary"
-        android:layout_marginEnd="10dp"/>
-
-    <!-- Total Value -->
+        android:textSize="@dimen/text_asset_instrument_info"
+        app:autoSizeMaxTextSize="@dimen/text_asset_instrument_info_max"
+        app:autoSizeMinTextSize="@dimen/text_asset_instrument_info_min"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform" />
 
     <TextView
         android:id="@+id/instrumentTotalValueText"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_weight="1.15"
+        android:gravity="end"
+        android:paddingStart="8dp"
         android:text="₺38,520"
-        android:textSize="14sp"
+        android:textColor="@color/vestia_text_primary"
+        android:textSize="@dimen/text_asset_instrument_info"
         android:textStyle="bold"
-        android:textColor="@color/vestia_text_primary"/>
+        app:autoSizeMaxTextSize="@dimen/text_asset_instrument_info_max"
+        app:autoSizeMinTextSize="@dimen/text_asset_instrument_info_min"
+        app:autoSizeStepGranularity="1sp"
+        app:autoSizeTextType="uniform" />
 
 </LinearLayout>

@@ -9,12 +9,23 @@
     <dimen name="text_total_portfolio_value_max">40sp</dimen>
     <dimen name="text_total_portfolio_value_min">20sp</dimen>
 
-    <dimen name="text_asset_title">20sp</dimen>
-    <dimen name="text_asset_title_max">28sp</dimen>
-    <dimen name="text_asset_title_min">16sp</dimen>
+    <!-- Asset Type sizes -->
+    <dimen name="text_asset_type_title">20sp</dimen>
+    <dimen name="text_asset_type_title_max">28sp</dimen>
+    <dimen name="text_asset_type_title_min">16sp</dimen>
+    <dimen name="text_asset_type_info">14sp</dimen>
+    <dimen name="text_asset_type_info_max">22sp</dimen>
+    <dimen name="text_asset_type_info_min">10sp</dimen>
 
-    <dimen name="text_asset_info">14sp</dimen>
-    <dimen name="text_asset_info_max">22sp</dimen>
-    <dimen name="text_asset_info_min">10sp</dimen>
+    <!-- Asset Instrument sizes -->
+    <dimen name="text_asset_instrument_title">18sp</dimen>
+    <dimen name="text_asset_instrument_title_max">26sp</dimen>
+    <dimen name="text_asset_instrument_title_min">14sp</dimen>
+    <dimen name="text_asset_instrument_info">12sp</dimen>
+    <dimen name="text_asset_instrument_info_max">20sp</dimen>
+    <dimen name="text_asset_instrument_info_min">8sp</dimen>
+
+
+
 
 </resources>

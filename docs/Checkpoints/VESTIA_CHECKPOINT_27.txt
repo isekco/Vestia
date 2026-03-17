@@ -1,0 +1,45 @@
+CHECKPOINT 27 — AssetType-based Expandable UI
+
+Summary:
+- Asset summary yapısı AssetInstrument bazından AssetType bazına refactor edildi
+- Expandable parent-child RecyclerView yapısı kuruldu
+- Parent: AssetType (CASH, XAU)
+- Child: AssetInstrument (USD, EUR, GRAM vb.)
+
+UI Changes:
+- item_asset_summary.xml → item_asset_type.xml olarak yeniden yapılandırıldı
+- Nested RecyclerView eklendi (instrument list)
+- Rate bilgisi parent'tan kaldırıldı, child seviyesine taşındı
+- AssetType için icon bazlı gösterim (CASH, XAU)
+- Expand / collapse davranışı eklendi
+- Child item layout (item_asset_instrument.xml) kolon bazlı hizalandı
+- Text alignment weight-based sistem ile düzeltildi
+
+Adapter Changes:
+- AssetAdapter expandable yapıya geçirildi
+- Child adapter (AssetInstrumentAdapter) aynı dosya içinde tanımlandı
+- Expand state adapter içinde yönetiliyor
+
+UI Model Changes:
+- AssetTypeUiModel artık quantity içermez
+- AssetInstrumentUiModel → quantity, rate, value içerir
+- UI modeli domain’den gelen veriye göre yeniden organize edildi
+
+Mapper Changes:
+- AssetUiMapper artık AssetType bazında grouping yapıyor
+- groupBy(assetType) + sort + map pipeline kuruldu
+- Type-level quantity kaldırıldı
+- Type-level value hesaplanıyor (null handling mevcut)
+- Instrument-level quantity / rate / value ayrı ayrı hesaplanıyor
+
+Known Issues / Next Topics:
+- Rate eksikliği (özellikle TRY) nedeniyle bazı value alanları "---"
+- ValuationEngine + RateRepository entegrasyonu gözden geçirilecek
+- Sorting ve aggregation debug ile detaylı incelenecek
+- Cost basis / maliyet kuru UI'a henüz taşınmadı
+- Owner / Account bazlı breakdown hazır ama UI yok
+
+Next Checkpoint Focus:
+- Debug üzerinden valuation pipeline doğrulama
+- Rate handling stratejisi (fallback / default / partial sum)
+- Domain → UI veri zenginleştirme (cost, breakdown)

@@ -32,5 +32,6 @@
     <string name="transaction_added">Transaction added.</string>
 
     <string name="portfolio_value_unavailable">---</string>
+    <string name="cash_icon">Cash Icon</string>
 
 </resources>
