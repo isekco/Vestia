@@ -38,7 +38,6 @@ class AssetAdapter(
         private val headerLayout: View = itemView.findViewById(R.id.headerLayout)
         private val assetTypeIcon: ImageView = itemView.findViewById(R.id.assetTypeIcon)
         private val assetTypeText: TextView = itemView.findViewById(R.id.assetTypeText)
-        private val assetQuantityText: TextView = itemView.findViewById(R.id.assetQuantityText)
         private val assetTotalValueText: TextView = itemView.findViewById(R.id.assetTotalValueText)
         private val expandIcon: ImageView = itemView.findViewById(R.id.expandIcon)
         private val instrumentRecyclerView: RecyclerView =
@@ -55,7 +54,6 @@ class AssetAdapter(
 
         fun bind(item: AssetTypeUiModel) {
             assetTypeText.text = item.assetTypeName
-            assetQuantityText.text = item.totalQuantityText
             assetTotalValueText.text = item.totalValueText
 
             bindAssetTypeIcon(item)

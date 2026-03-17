@@ -51,19 +51,6 @@
                 app:autoSizeTextType="uniform" />
 
             <TextView
-                android:id="@+id/assetQuantityText"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="@string/empty_string"
-                android:textColor="@color/vestia_text_secondary"
-                android:textSize="@dimen/text_asset_info"
-                app:autoSizeMaxTextSize="@dimen/text_asset_info_max"
-                app:autoSizeMinTextSize="@dimen/text_asset_info_min"
-                app:autoSizeStepGranularity="1sp"
-                app:autoSizeTextType="uniform" />
-
-            <TextView
                 android:id="@+id/assetTotalValueText"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -84,8 +71,10 @@
                 android:layout_width="18dp"
                 android:layout_height="18dp"
                 android:layout_marginEnd="10dp"
+                android:contentDescription="TODO"
                 android:src="@drawable/ic_expand_more"
                 app:tint="@color/vestia_text_secondary"/>
+
         </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
