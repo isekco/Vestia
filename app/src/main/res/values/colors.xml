@@ -13,10 +13,11 @@
     <color name="vestia_black">#000000</color>
 
     <!-- Asset colors -->
-    <color name="asset_usd">#4D79D8</color>
-    <color name="asset_eur">#CC640F</color>
-    <color name="asset_gbp">#5B9134</color>
-    <color name="asset_xau">#F0CD5D</color>
+    <color name="vestia_cash_green">#2ECC71</color>  <!-- güzel soft yeşil -->
+    <color name="vestia_gold">#D4AF37</color>        <!-- altın sarısı -->
+
+    <!--<color name="vestia_cash_green">#3CB371</color>
+    <color name="vestia_gold">#C9A227</color>-->
 
     <!-- State / helper -->
     <color name="legend_unselected">#B8B8B8</color>

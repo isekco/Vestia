@@ -1,0 +1,30 @@
+Vestia - Checkpoint 29
+Visual polish checkpoint completed
+
+Scope
+- Instrument row layout refined for better visual alignment
+- Column spacing improved to separate quantity, rate, and total more clearly
+- Text sizing behavior stabilized to reduce inconsistent visual scaling
+- Asset type icon approach replaced with colored dot indicators
+- CASH dot set to green
+- XAU dot set to yellow/gold
+- Asset type header dot moved inward from card edge for cleaner spacing
+
+What was improved
+- Instrument columns now feel more balanced and easier to scan
+- Rate and total columns are visually separated better
+- TRY / USD / XAU rows now look more consistent in alignment
+- Header presentation is cleaner and more minimal with dots instead of icons
+- Asset cards now have clearer type distinction with simple color coding
+
+Notes
+- Dot spacing issue was fixed by adjusting header layout padding instead of padding on the dot itself
+- The current visual structure is now in a good place to continue with feature additions
+
+Next checkpoint candidate
+- Owner / Account breakdown
+- Left frame / navigation structure
+- Alternate grouping or filter modes if needed
+
+Status
+- Checkpoint closed

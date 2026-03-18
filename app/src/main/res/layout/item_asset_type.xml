@@ -17,24 +17,22 @@
         android:orientation="vertical">
 
         <LinearLayout
-
             android:id="@+id/headerLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="10dp"
             android:paddingTop="12dp"
             android:paddingBottom="12dp">
 
-            <ImageView
-                android:id="@+id/assetTypeIcon"
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:layout_marginStart="10dp"
-                android:layout_marginEnd="10dp"
-                android:contentDescription="@string/cash_icon"
-                android:src="@drawable/ic_cash"
-                app:tint="@color/vestia_text_secondary" />
+            <View
+                android:id="@+id/assetTypeIndicator"
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_marginEnd="8dp"
+                android:background="@drawable/bg_dot_cash" />
 
             <TextView
                 android:id="@+id/assetTypeText"
@@ -68,12 +66,10 @@
 
             <ImageView
                 android:id="@+id/expandIcon"
-                android:layout_width="26dp"
-                android:layout_height="26dp"
-                android:layout_marginEnd="10dp"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="@string/expand_icon"
-                android:src="@drawable/ic_expand_more"
-                app:tint="@color/vestia_text_secondary"/>
+                android:src="@drawable/ic_expand_more" />
 
         </LinearLayout>
 
@@ -81,8 +77,8 @@
             android:id="@+id/instrumentRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="40dp"
-            android:layout_marginEnd="10dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="20dp"
             android:layout_marginBottom="10dp"
             android:nestedScrollingEnabled="false"
             android:overScrollMode="never"

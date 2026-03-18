@@ -36,7 +36,7 @@ class AssetAdapter(
     inner class AssetTypeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
         private val headerLayout: View = itemView.findViewById(R.id.headerLayout)
-        private val assetTypeIcon: ImageView = itemView.findViewById(R.id.assetTypeIcon)
+        private val assetTypeIcon: View = itemView.findViewById(R.id.assetTypeIndicator)
         private val assetTypeText: TextView = itemView.findViewById(R.id.assetTypeText)
         private val assetTotalValueText: TextView = itemView.findViewById(R.id.assetTotalValueText)
         private val expandIcon: ImageView = itemView.findViewById(R.id.expandIcon)
@@ -82,11 +82,11 @@ class AssetAdapter(
 
         private fun bindAssetTypeIcon(item: AssetTypeUiModel) {
             val iconRes = when (item.assetTypeName.uppercase()) {
-                "CASH" -> R.drawable.ic_cash
-                "XAU" -> R.drawable.ic_gold
-                else -> R.drawable.ic_cash
+                "CASH" -> R.drawable.bg_dot_cash
+                "XAU" -> R.drawable.bg_dot_xau
+                else -> R.drawable.bg_dot_cash
             }
-            assetTypeIcon.setImageResource(iconRes)
+            assetTypeIcon.setBackgroundResource(iconRes)
         }
     }
 
