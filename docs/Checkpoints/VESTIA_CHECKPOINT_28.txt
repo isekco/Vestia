@@ -1,0 +1,32 @@
+CHECKPOINT SUMMARY
+
+Checkpoint amacı:
+TRY rate problemi çözüldü ve Domain -> UI dönüşüm hattı debug edilebilir hale getirilmeye başlandı.
+
+Bu checkpointte yapılanlar:
+- RateDataSource içinde TRY için rate eksikliği düzeltildi.
+- base currency olan TRY’nin rate map’ine sabit "TRY" -> "1" değeri eklendi.
+- Böylece TRY asset/cash tarafında kur kaynaklı eksik hesaplama probleminin önü alındı.
+- Domain to UI tarafındaki toplu zincir işlem debug kolaylığı için parçalı adımlara ayrıldı.
+- Özellikle valuedPositions -> groupBy -> sortedMap -> uiModel map akışı ara değişkenlerle okunabilir hale getirildi.
+- Amaç, veri kaybı veya yanlış dönüşüm varsa her adımda breakpoint ve inspection yapabilmek.
+
+Teknik notlar:
+- TRY, base currency olduğu için dönüşüm oranı 1 kabul edildi.
+- Bu çözüm RateDataSource seviyesinde yapıldı; yani üst katmanlar TRY için ayrıca özel durum yönetmek zorunda kalmıyor.
+- Domain -> UI akışında artık şu ara adımlar ayrı ayrı izlenebilecek:
+  1. groupedByAssetType
+  2. sortedByAssetType
+  3. assetTypeUiModels
+- Bir sonraki adımda özellikle UI model üretiminde sayı, rate, valuation ve görünüm ilişkisi daha rahat incelenebilecek.
+
+Bu checkpointte özellikle girilmedi:
+- Görsel düzenlemeler
+- UI polishing
+- Son görünüm iyileştirmeleri
+- Domain model veya valuation tarafında yeni davranış değişikliği
+
+Sonraki checkpoint planı:
+- Görsel tarafa geçilecek
+- Domain to UI debug sonuçlarına göre gerekirse mapping veya UI bind tarafı revize edilecek
+- Özellikle sayıların, değerlerin ve satır yerleşimlerinin ekranda doğru temsil edilmesi incelenecek

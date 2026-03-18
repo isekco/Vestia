@@ -23,15 +23,20 @@ object AssetUiMapper {
 
         if (valuedPositions.isEmpty()) return emptyList()
 
-        return valuedPositions
-            .groupBy { it.position.key.assetKey.assetType }
-            .toSortedMap(compareBy { assetTypeOrder(it) })
-            .map { (assetType, positionsOfType) ->
-                toAssetTypeUiModel(
-                    assetType = assetType,
-                    positions = positionsOfType
-                )
-            }
+        val groupedByAssetType = valuedPositions.groupBy { valuedPosition ->
+            valuedPosition.position.key.assetKey.assetType }
+
+        val sortedByAssetType  = groupedByAssetType.toSortedMap(
+            compareBy { assetTypeOrder(it) })
+
+        val assetTypeUiModel = sortedByAssetType.map { (assetType, positionsOfType) ->
+            toAssetTypeUiModel(
+                assetType = assetType,
+                positions = positionsOfType
+            )
+        }
+
+        return assetTypeUiModel
     }
 
     fun toTotalPortfolioValueText(
@@ -56,16 +61,20 @@ object AssetUiMapper {
         positions: List<ValuedPosition>
     ): AssetTypeUiModel {
 
-        val instrumentItems = positions
-            .groupBy { it.position.key.assetKey.assetInstrument }
-            .toList()
-            .sortedBy { (_, items) -> instrumentOrder(items.first().position.key.assetKey.assetInstrument) }
-            .map { (instrument, instrumentPositions) ->
-                toInstrumentUiModel(
-                    instrument = instrument,
-                    positions = instrumentPositions
-                )
-            }
+        val groupedByAssetInstrument = positions.groupBy { position ->
+            position.position.key.assetKey.assetInstrument
+        }
+
+        val sortedByAssetInstrument = groupedByAssetInstrument.toSortedMap(
+            compareBy { instrumentOrder(it)} )
+
+
+        val instrumentItems = sortedByAssetInstrument.map { (instrument, instrumentPositions) ->
+            toInstrumentUiModel(
+                instrument = instrument,
+                positions = instrumentPositions
+            )
+        }
 
         val totalMarketValue =
             if (positions.any { it.marketValue == null }) {

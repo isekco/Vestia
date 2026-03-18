@@ -8,6 +8,7 @@ package com.isekco.vestia.data.dto
  * {
  *   "base": "TRY",
  *   "cashRates": {
+ *     "TRY": 1,
  *     "USD": 39.25,
  *     "EUR": 42.80,
  *     "GBP": 50.10

@@ -80,6 +80,7 @@ class RateDataSource(
             baseCurrency = "TRY",
             timestamp = findTimeValue(currencyRatesArray[0].asJsonObject),
             cashRates = mapOf(
+                "TRY" to "1", // Since it is same as base currency
                 "USD" to findRateValue(currencyRatesArray, "USD"),
                 "EUR" to findRateValue(currencyRatesArray, "EUR"),
                 "GBP" to findRateValue(currencyRatesArray, "GBP")
