@@ -1,6 +1,7 @@
 package com.isekco.vestia.ui.main
 
 import android.os.Bundle
+import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.viewModels
@@ -18,10 +19,11 @@ import kotlinx.coroutines.launch
 class MainActivity : AppCompatActivity() {
 
     private lateinit var totalPortfolioValueText: TextView
+    private lateinit var menuButton: ImageButton
     private lateinit var assetRecyclerView: RecyclerView
     private lateinit var addTransactionFab: FloatingActionButton
     private lateinit var assetAdapter: AssetAdapter
-    private val viewModel: MainViewModel by viewModels(){
+    private val viewModel: MainViewModel by viewModels {
         MainViewModelFactory(
             (application as VestiaApp).container.loadPortfolioSummaryUseCase
         )
@@ -39,6 +41,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun bindViews() {
         totalPortfolioValueText = findViewById(R.id.totalPortfolioValueText)
+        menuButton = findViewById(R.id.portfolioMenuButton)
         assetRecyclerView = findViewById(R.id.assetRecyclerView)
         addTransactionFab = findViewById(R.id.addTransactionFab)
     }
@@ -51,7 +54,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupClicks() {
         addTransactionFab.setOnClickListener {
-            Toast.makeText(this, "Add Transaction daha bağlanmadı", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "Add Transaction", Toast.LENGTH_SHORT).show()
+        }
+
+        menuButton.setOnClickListener {
+            val sheet = ManagementBottomSheet()
+            sheet.show(supportFragmentManager, "ManagementBottomSheet")
         }
     }
 

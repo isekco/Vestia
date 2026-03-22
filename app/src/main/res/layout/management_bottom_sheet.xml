@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <!-- TITLE -->
+    <TextView
+        android:id="@+id/managementTitleText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Manage Data"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:paddingBottom="16dp" />
+
+    <!-- ===================== -->
+    <!-- OWNERS HEADER -->
+    <!-- ===================== -->
+    <LinearLayout
+        android:id="@+id/ownersHeaderLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingVertical="12dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/ownersMenuText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Owners"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/ownersExpandIcon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="▼"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <!-- ===================== -->
+    <!-- OWNERS CONTENT -->
+    <!-- ===================== -->
+    <LinearLayout
+        android:id="@+id/ownersContentLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        android:paddingStart="8dp">
+
+        <!-- OWNER LIST -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ownersRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false" />
+
+        <!-- ADD OWNER -->
+        <TextView
+            android:id="@+id/addOwnerText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="+ Add Owner"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:paddingVertical="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+    <!-- ===================== -->
+    <!-- ACCOUNTS -->
+    <!-- ===================== -->
+    <TextView
+        android:id="@+id/accountsMenuText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Accounts"
+        android:textSize="16sp"
+        android:paddingVertical="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
+
+    <!-- ===================== -->
+    <!-- TRANSACTIONS -->
+    <!-- ===================== -->
+    <TextView
+        android:id="@+id/transactionsMenuText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Transactions"
+        android:textSize="16sp"
+        android:paddingVertical="12dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="?attr/selectableItemBackground" />
+
+</LinearLayout>

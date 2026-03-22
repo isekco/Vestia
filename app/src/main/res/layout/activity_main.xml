@@ -25,10 +25,23 @@
             android:id="@+id/topTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:text="@string/portfolio_summary"
             android:textColor="@color/vestia_white"
             android:textSize="@dimen/text_portfolio_summary_title"
-            android:textStyle="bold" />
+            android:textStyle="bold"/>
+
+        <ImageButton
+            android:id="@+id/portfolioMenuButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Portfolio menu"
+            android:padding="8dp"
+            android:src="@android:drawable/ic_menu_more"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
     </LinearLayout>
 
     <com.google.android.material.card.MaterialCardView
