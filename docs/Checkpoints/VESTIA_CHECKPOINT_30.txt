@@ -1,0 +1,15 @@
+Checkpoint 30 - Owner Management (CRUD complete)
+
+- Added full-screen Management Bottom Sheet
+- Implemented Owners section with expandable list
+- Integrated RecyclerView with OwnerListAdapter
+- Connected real data via LoadOwnersUseCase
+- Implemented AddOwnerUseCase with dialog input
+- Implemented EditOwnerUseCase with prefilled dialog
+- Implemented DeleteOwnerUseCase with validation
+- Added confirmation dialog for delete action
+- Replaced error toasts with info dialogs for blocked deletions
+- Persisted all changes via saveLedger (JSON write + cache update)
+
+Flow:
+Menu → Bottom Sheet → Owners → Add / Edit / Delete → JSON persist → UI refresh

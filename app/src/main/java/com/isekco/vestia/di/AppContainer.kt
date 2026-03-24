@@ -12,6 +12,7 @@ import com.isekco.vestia.domain.engine.ValuationEngine
 import com.isekco.vestia.domain.repository.LedgerRepository
 import com.isekco.vestia.domain.repository.RateRepository
 import com.isekco.vestia.domain.usecase.AddOwnerUseCase
+import com.isekco.vestia.domain.usecase.DeleteOwnerUseCase
 import com.isekco.vestia.domain.usecase.EditOwnerUseCase
 import com.isekco.vestia.domain.usecase.LoadOwnersUseCase
 import com.isekco.vestia.domain.usecase.LoadPortfolioSummaryUseCase
@@ -49,6 +50,11 @@ class AppContainer(appContext: Context) {
 
     val editOwnerUseCase: EditOwnerUseCase =
         EditOwnerUseCase(
+            ledgerRepository = ledgerRepository
+        )
+
+    val deleteOwnerUseCase: DeleteOwnerUseCase =
+        DeleteOwnerUseCase(
             ledgerRepository = ledgerRepository
         )
 }

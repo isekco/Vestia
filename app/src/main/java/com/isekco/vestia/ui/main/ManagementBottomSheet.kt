@@ -16,6 +16,7 @@ import com.isekco.vestia.R
 import com.isekco.vestia.domain.usecase.LoadOwnersUseCase
 import com.isekco.vestia.domain.usecase.AddOwnerUseCase
 import com.isekco.vestia.domain.usecase.EditOwnerUseCase
+import com.isekco.vestia.domain.usecase.DeleteOwnerUseCase
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 import com.isekco.vestia.VestiaApp
@@ -42,6 +43,10 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
 
     private val editOwnerUseCase: EditOwnerUseCase by lazy {
         (requireActivity().application as VestiaApp).container.editOwnerUseCase
+    }
+
+    private val deleteOwnerUseCase: DeleteOwnerUseCase by lazy {
+        (requireActivity().application as VestiaApp).container.deleteOwnerUseCase
     }
 
     override fun onCreateView(
@@ -93,11 +98,7 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
                 showEditOwnerDialog(owner)
             },
             onDeleteClick = { owner ->
-                Toast.makeText(
-                    requireContext(),
-                    "Delete ${owner.name}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showDeleteOwnerDialog(owner)
             }
         )
 
@@ -249,5 +250,45 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
                 ).show()
             }
         }
+    }
+
+    private fun showDeleteOwnerDialog(owner: OwnerListItemUiModel) {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Delete Owner")
+            .setMessage("Delete ${owner.name}?")
+            .setPositiveButton("Delete") { _, _ ->
+                deleteOwner(owner)
+            }
+            .setNegativeButton("Cancel", null)
+            .show()
+    }
+
+    private fun deleteOwner(owner: OwnerListItemUiModel) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val deletedOwner = deleteOwnerUseCase(owner.id)
+
+                Toast.makeText(
+                    requireContext(),
+                    "Deleted ${deletedOwner.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                loadOwners()
+            } catch (e: Exception) {
+                showInfoDialog(
+                    title = "Owner Cannot Be Deleted",
+                    message = e.message ?: "Owner could not be deleted."
+                )
+            }
+        }
+    }
+
+    private fun showInfoDialog(title: String, message: String) {
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle(title)
+            .setMessage(message)
+            .setPositiveButton("OK", null)
+            .show()
     }
 }
