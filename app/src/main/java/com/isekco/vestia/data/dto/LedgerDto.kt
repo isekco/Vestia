@@ -16,13 +16,12 @@ data class TransactionDto(
     val id: String,
     val ownerId: String,
     val accountId: String,
-    val epochMs: Long,
+    val epochMs: String,
     val transactionType: String,
     val assetType: String,
     val assetInstrument: String,
     val quantity: String,
     val unitPrice: String, // In terms of base currency (TRY/AssetInstrument)
-    val priceCurrency: String,
     val tags: String?
 )
 

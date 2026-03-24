@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.isekco.vestia.data.datasource.LedgerDataSource
 import com.isekco.vestia.data.dto.LedgerDto
 import com.isekco.vestia.data.mapper.toDomain
+import com.isekco.vestia.data.mapper.toDto
 import com.isekco.vestia.domain.model.*
 import com.isekco.vestia.domain.repository.LedgerRepository
 
@@ -28,6 +29,15 @@ class LedgerRepositoryImpl(
             val ledger = dto.toDomain()
             cached = ledger
             return ledger
+        }
+    }
+
+    override suspend fun saveLedger(ledger: Ledger) {
+        synchronized(lock) {
+            val ledgerDto = ledger.toDto()
+            val json = gson.toJson(ledgerDto)
+            dataSource.writeLedgerJson(json)
+            cached = ledger
         }
     }
 

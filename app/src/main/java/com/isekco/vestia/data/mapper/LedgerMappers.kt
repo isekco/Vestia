@@ -8,12 +8,9 @@ import java.math.BigDecimal
 
 /**
  * DTO (JSON/storage format) -> Domain (business model) mappers.
- *
- * Design:
- * - Single entry point: [LedgerDto.toDomain].
- * - All other mapping helpers are private to prevent partial/inconsistent mappings.
  */
 internal fun LedgerDto.toDomain(): Ledger {
+
     val ownersDomain: List<Owner> = owners.map { it.toDomain() }
     val accountsDomain: List<Account> = accounts.map { it.toDomain() }
 
@@ -82,7 +79,7 @@ private fun TransactionDto.toDomain(
     require(id.isNotBlank()) { "Transaction.id must not be blank" }
     require(ownerId.isNotBlank()) { "Transaction.ownerId must not be blank (txId=$id)" }
     require(accountId.isNotBlank()) { "Transaction.accountId must not be blank (txId=$id)" }
-    require(epochMs > 0L) { "Transaction.epochMs must be positive (txId=$id)" }
+    require(epochMs.toLong() > 0L) { "Transaction.epochMs must be positive (txId=$id)" }
     require(assetInstrument.isNotBlank()) { "Transaction.assetInstrument must not be blank (txId=$id)" }
 
     require(ownerIds.contains(ownerId)) {
@@ -122,7 +119,7 @@ private fun TransactionDto.toDomain(
         id = id,
         ownerId = ownerId,
         accountId = accountId,
-        epochMs = epochMs,
+        epochMs = epochMs.toLong(),
 
         transactionType = txType,
 
@@ -133,5 +130,56 @@ private fun TransactionDto.toDomain(
         unitPrice = price,
 
         tags = tags?.takeIf { it.isNotBlank() }
+    )
+}
+
+
+/**
+ * Domain (business model) --> DTO (JSON/storage format) mappers.
+ */
+internal fun Ledger.toDto(): LedgerDto {
+
+    val ownersDto: List<OwnerDto> = owners.map { it.toDto() }
+    val accountsDto: List<AccountDto> = accounts.map { it.toDto() }
+
+    val transactionsDto: List<TransactionDto> = transactions.map { it.toDto() }
+
+    return LedgerDto(
+        schemaVersion = schemaVersion,
+        baseCurrency = baseCurrency.name,
+        owners = ownersDto,
+        accounts = accountsDto,
+        transactions = transactionsDto,
+    )
+}
+
+private fun Owner.toDto(): OwnerDto {
+    return OwnerDto(
+        id = id,
+        name = name
+    )
+}
+
+private fun Account.toDto(): AccountDto {
+    return AccountDto(
+        id = id,
+        ownerId = ownerId,
+        name = name,
+        currency = currency.name
+    )
+}
+
+private fun Transaction.toDto(): TransactionDto {
+    return TransactionDto(
+        id = id,
+        ownerId = ownerId,
+        accountId = accountId,
+        epochMs = epochMs.toString(),
+        transactionType = transactionType.name,
+        assetType = assetType.name,
+        assetInstrument = assetInstrument.toString(),
+        quantity = quantity.toPlainString(),
+        unitPrice = unitPrice.toPlainString(),
+        tags = tags
     )
 }
