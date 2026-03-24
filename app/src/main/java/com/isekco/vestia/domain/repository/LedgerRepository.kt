@@ -7,5 +7,6 @@ import com.isekco.vestia.domain.model.Ledger
  */
 interface LedgerRepository {
     suspend fun getLedger(forceRefresh: Boolean = false): Ledger
+    suspend fun saveLedger(ledger: Ledger)
     fun invalidate()
 }
