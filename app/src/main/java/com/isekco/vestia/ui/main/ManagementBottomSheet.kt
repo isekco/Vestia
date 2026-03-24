@@ -15,6 +15,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.isekco.vestia.R
 import com.isekco.vestia.domain.usecase.LoadOwnersUseCase
 import com.isekco.vestia.domain.usecase.AddOwnerUseCase
+import com.isekco.vestia.domain.usecase.EditOwnerUseCase
 import kotlinx.coroutines.launch
 import androidx.lifecycle.lifecycleScope
 import com.isekco.vestia.VestiaApp
@@ -37,6 +38,10 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
 
     private val addOwnerUseCase: AddOwnerUseCase by lazy {
         (requireActivity().application as VestiaApp).container.addOwnerUseCase
+    }
+
+    private val editOwnerUseCase: EditOwnerUseCase by lazy {
+        (requireActivity().application as VestiaApp).container.editOwnerUseCase
     }
 
     override fun onCreateView(
@@ -85,11 +90,7 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
     private fun setupOwnerRecyclerView() {
         ownerListAdapter = OwnerListAdapter(
             onEditClick = { owner ->
-                Toast.makeText(
-                    requireContext(),
-                    "Edit ${owner.name}",
-                    Toast.LENGTH_SHORT
-                ).show()
+                showEditOwnerDialog(owner)
             },
             onDeleteClick = { owner ->
                 Toast.makeText(
@@ -114,6 +115,8 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
         addOwnerText.setOnClickListener {
             showAddOwnerDialog()
         }
+
+
 
         accountsMenuText.setOnClickListener {
             Toast.makeText(requireContext(), "Accounts clicked", Toast.LENGTH_SHORT).show()
@@ -187,6 +190,61 @@ class ManagementBottomSheet : BottomSheetDialogFragment() {
                 Toast.makeText(
                     requireContext(),
                     e.message ?: "Owner could not be added",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    private fun showEditOwnerDialog(owner: OwnerListItemUiModel) {
+        val input = android.widget.EditText(requireContext()).apply {
+            setText(owner.name)
+            setSelection(owner.name.length)
+            hint = "Owner name"
+            setSingleLine(true)
+        }
+
+        androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setTitle("Edit Owner")
+            .setView(input)
+            .setPositiveButton("Save", null)
+            .setNegativeButton("Cancel", null)
+            .create()
+            .also { dialog ->
+                dialog.setOnShowListener {
+                    val positiveButton =
+                        dialog.getButton(androidx.appcompat.app.AlertDialog.BUTTON_POSITIVE)
+
+                    positiveButton.setOnClickListener {
+                        val newName = input.text.toString()
+                        editOwner(owner.id, newName, dialog)
+                    }
+                }
+                dialog.show()
+            }
+    }
+
+    private fun editOwner(
+        ownerId: String,
+        newName: String,
+        dialog: androidx.appcompat.app.AlertDialog
+    ) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            try {
+                val updatedOwner = editOwnerUseCase(ownerId, newName)
+
+                Toast.makeText(
+                    requireContext(),
+                    "Updated ${updatedOwner.name}",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                loadOwners()
+                dialog.dismiss()
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireContext(),
+                    e.message ?: "Owner could not be updated",
                     Toast.LENGTH_SHORT
                 ).show()
             }
